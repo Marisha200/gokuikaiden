@@ -214,10 +214,10 @@ export const FUTURE_ROADMAP: RoadmapStep[] = [
     unlocked: false,
     summary: "En la próxima lección profundizaremos en el trazado consciente de los tres símbolos de Reiki y sus kotodamas individuales para la sanación emocional y a distancia.",
     topics: [
-      "Trazado Sagrado y Kotodamas del CKR, SHK y HSZSN",
+      "Trazado de Símbolos y Kotodamas del CKR, SHK y HSZSN",
       "El Puente del Tiempo: Sanación en el Pasado y Futuro",
       "Prácticas de Sanación a Distancia Avanzada",
-      "Uso de la Caja de Reiki Tradicional"
+      "Uso de la Caja de Reiki Tradicional (occidental)"
     ]
   }
 ];
