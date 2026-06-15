@@ -60,176 +60,27 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [kanjiSubTab, setKanjiSubTab] = useState<string>("origen");
 
-  // Custom persistent videos state
-  const [customVideos, setCustomVideos] = useState<{ id: string; title: string; description: string; url: string; type?: "youtube" | "vimeo" | "youtube_playlist" }[]>(() => {
-    try {
-      const saved = localStorage.getItem("rincon_zen_videos");
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error(e);
-    }
+  // Videos oficiales estables cargados directamente en el código para los alumnos de Rincón Zen
+  const [customVideos] = useState<{ id: string; title: string; description: string; url: string; type?: "youtube" | "vimeo" | "youtube_playlist" }[]>(() => {
     return [
       {
-        id: "7aOHe0qVIsM",
-        type: "youtube",
-        title: "Meditación Gassho y Sanación Consciente",
-        description: "Alineación y sintonización de tus canales mediante los Gokai en posición contemplativa.",
-        url: "https://www.youtube.com/watch?v=7aOHe0qVIsM"
-      },
-      {
-        id: "qGv_7oM_4Z4",
-        type: "youtube",
-        title: "Recitación Diaria de los 5 Preceptos (Gokai)",
-        description: "Acompaña a Marina en la entonación sagrada del Kotodama para armonizar tu día.",
-        url: "https://www.youtube.com/watch?v=qGv_7oM_4Z4"
-      },
-      {
-        id: "uKAtVbF7oM4",
-        type: "youtube",
-        title: "Práctica Byosen Reikan Ho para Sanación",
-        description: "Demostración de sintonía e identificación de campos magnéticos y disturbios físicos.",
-        url: "https://www.youtube.com/watch?v=uKAtVbF7oM4"
-      },
-      {
-        id: "172033285",
-        type: "vimeo",
-        title: "Ambiente Natural y Conexión Reiki",
-        description: "Música y video de relajación de la naturaleza para sintonizar en tus meditaciones diarias.",
-        url: "https://vimeo.com/172033285"
-      },
-      {
-        id: "PL3AFFF59EFFE30238",
+        id: "PL0g9expKbVYIsIq5LNskW-C44imC4sdvS",
         type: "youtube_playlist",
-        title: "Música Tradicional Japonesa y Shakuhachi (Playlist)",
-        description: "Colección curada de melodías tradicionales de flauta Shakuhachi japonesa para ambientar las sesiones de Reiki.",
-        url: "https://www.youtube.com/playlist?list=PL3AFFF59EFFE30238"
+        title: "La verdadera historia de Reiki",
+        description: "Serie de videos (playlist) sobre los orígenes, verdad histórica y linaje directo de Mikao Usui.",
+        url: "https://www.youtube.com/watch?v=8F1tIfEnh-8&list=PL0g9expKbVYIsIq5LNskW-C44imC4sdvS&index=1"
+      },
+      {
+        id: "96606036",
+        type: "vimeo",
+        title: "Byosen con Frank Arjava Petter",
+        description: "No te olvides de hacer click en CC para verlo en español.",
+        url: "https://vimeo.com/96606036"
       }
     ];
   });
 
-  useEffect(() => {
-    localStorage.setItem("rincon_zen_videos", JSON.stringify(customVideos));
-  }, [customVideos]);
-
-  const [selectedVideoId, setSelectedVideoId] = useState<string>(() => {
-    try {
-      const saved = localStorage.getItem("rincon_zen_videos");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.length > 0) {
-          return parsed[0].id;
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
-    return "7aOHe0qVIsM";
-  });
-
-  // Video Form state
-  const [newVideoTitle, setNewVideoTitle] = useState("");
-  const [newVideoUrl, setNewVideoUrl] = useState("");
-  const [newVideoDesc, setNewVideoDesc] = useState("");
-  const [videoError, setVideoError] = useState("");
-
-  const handleAddVideo = (e: React.FormEvent) => {
-    e.preventDefault();
-    setVideoError("");
-
-    if (!newVideoTitle.trim()) {
-      setVideoError("Por favor ingresa un título.");
-      return;
-    }
-    if (!newVideoUrl.trim()) {
-      setVideoError("Por favor ingresa la URL de YouTube o Vimeo.");
-      return;
-    }
-
-    // Check if YouTube Playlist URL parameter 'list' exists
-    const listRegex = /[?&]list=([^#\&\?]+)/;
-    const listMatch = newVideoUrl.match(listRegex);
-    const playlistId = listMatch ? listMatch[1] : null;
-
-    if (playlistId) {
-      setCustomVideos(prev => [
-        ...prev,
-        {
-          id: playlistId,
-          type: "youtube_playlist",
-          title: newVideoTitle,
-          description: newVideoDesc || "Lista de reproducción de YouTube para sintonizar en tus meditaciones.",
-          url: newVideoUrl
-        }
-      ]);
-
-      setNewVideoTitle("");
-      setNewVideoUrl("");
-      setNewVideoDesc("");
-      return;
-    }
-
-    // Check if Vimeo URL
-    const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)/;
-    const vimeoMatch = newVideoUrl.match(vimeoRegex);
-    const vimeoId = vimeoMatch ? vimeoMatch[1] : null;
-
-    if (vimeoId) {
-      setCustomVideos(prev => [
-        ...prev,
-        {
-          id: vimeoId,
-          type: "vimeo",
-          title: newVideoTitle,
-          description: newVideoDesc || "Video de Vimeo subido para la maestría de Rincón Zen.",
-          url: newVideoUrl
-        }
-      ]);
-
-      setNewVideoTitle("");
-      setNewVideoUrl("");
-      setNewVideoDesc("");
-      return;
-    }
-
-    // Check if YouTube URL
-    const ytRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const ytMatch = newVideoUrl.match(ytRegExp);
-    const ytId = (ytMatch && ytMatch[2].length === 11) ? ytMatch[2] : null;
-
-    if (!ytId) {
-      setVideoError("URL inválida. Copia un enlace de YouTube válido (video o playlist) o Vimeo (ej: vimeo.com/172033285).");
-      return;
-    }
-
-    setCustomVideos(prev => [
-      ...prev,
-      {
-        id: ytId,
-        type: "youtube",
-        title: newVideoTitle,
-        description: newVideoDesc || "Video de YouTube subido para la maestría de Rincón Zen.",
-        url: newVideoUrl
-      }
-    ]);
-
-    setNewVideoTitle("");
-    setNewVideoUrl("");
-    setNewVideoDesc("");
-  };
-
-  const handleDeleteVideo = (idToDelete: string) => {
-    setCustomVideos(prev => {
-      const filtered = prev.filter(v => v.id !== idToDelete);
-      if (selectedVideoId === idToDelete) {
-        if (filtered.length > 0) {
-          setSelectedVideoId(filtered[0].id);
-        } else {
-          setSelectedVideoId("");
-        }
-      }
-      return filtered;
-    });
-  };
+  const [selectedVideoId, setSelectedVideoId] = useState<string>("PL0g9expKbVYIsIq5LNskW-C44imC4sdvS");
 
   // Diagnostic Simulator State
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
@@ -1566,7 +1417,7 @@ export default function App() {
                   </div>
 
                   <p className="text-natural-text-muted text-sm leading-relaxed">
-                    Acompaña tu instrucción teórica con recursos audiovisuales. Visualiza meditaciones guiadas, demostraciones de posiciones o recitaciones de los Gokai. Puedes reproducir los videos integrados o agregar tus propios enlaces de <strong>YouTube (Videos o Listas/Playlists) y Vimeo</strong>.
+                    Acompaña tu instrucción teórica con recursos audiovisuales oficiales de la maestría. Visualiza las listas de reproducción recomendadas y videos demostrativos seleccionados para tu formación de Gokuikaiden.
                   </p>
 
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1626,7 +1477,7 @@ export default function App() {
                                     : "YouTube Video"}
                                 </span>
                               </div>
-                              <p className="text-xs text-natural-text-muted leading-relaxed">
+                              <p className="text-xs text-natural-text-muted leading-relaxed whitespace-pre-line">
                                 {customVideos.find(v => v.id === selectedVideoId)?.description}
                               </p>
                             </div>
@@ -1635,20 +1486,20 @@ export default function App() {
                       ) : (
                         <div className="bg-natural-sand/30 border border-dashed border-natural-border p-12 text-center rounded-3xl">
                           <Video className="w-12 h-12 text-natural-primary/40 mx-auto mb-3" />
-                          <p className="text-sm text-natural-text-muted">Selecciona un video de la lista para comenzar la reproducción.</p>
+                          <p className="text-sm text-natural-text-muted">Selecciona un video de la lista para comenzar la de reproducción.</p>
                         </div>
                       )}
                     </div>
 
-                    {/* Right Column: Video list & Add Video Form */}
+                    {/* Right Column: Video list (No Add Form for students) */}
                     <div className="space-y-6">
                       {/* Video List */}
                       <div className="bg-white p-5 rounded-3xl border border-natural-border shadow-3xs space-y-3">
                         <h4 className="font-serif text-xs font-bold text-natural-dark uppercase tracking-widest border-b pb-2 border-natural-border/60">
-                          Lista de Reproducción ({customVideos.length})
+                          Videos de la Maestría ({customVideos.length})
                         </h4>
                         
-                        <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+                        <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
                           {customVideos.map((video) => {
                             const isSelected = selectedVideoId === video.id;
                             const isVimeo = video.type === "vimeo";
@@ -1664,33 +1515,17 @@ export default function App() {
                               >
                                 <button
                                   onClick={() => setSelectedVideoId(video.id)}
-                                  className="flex items-center gap-2.5 text-xs text-left flex-1 min-w-0"
+                                  className="flex items-center gap-2.5 text-xs text-left w-full min-w-0"
                                 >
                                   <div className={`p-1.5 rounded-lg shrink-0 ${isSelected ? "bg-natural-primary text-white" : "bg-natural-sand text-natural-primary"}`}>
                                     <Play className="w-3.5 h-3.5 fill-current" />
                                   </div>
                                   <div className="flex flex-col min-w-0">
-                                    <span className="truncate pr-1 block font-medium">{video.title}</span>
+                                    <span className="truncate pr-1 block font-semibold">{video.title}</span>
                                     <span className="text-[9px] text-natural-text-muted/80 uppercase font-mono tracking-widest">
                                       {isVimeo ? "Vimeo" : isPlaylist ? "Playlist de YT" : "YouTube Video"}
                                     </span>
                                   </div>
-                                </button>
-
-                                {/* Delete Custom Video */}
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    handleDeleteVideo(video.id);
-                                    if (selectedVideoId === video.id) {
-                                      const remaining = customVideos.filter(v => v.id !== video.id);
-                                      setSelectedVideoId(remaining[0]?.id || "");
-                                    }
-                                  }}
-                                  className="text-natural-primary/60 hover:text-red-500 p-1 rounded-md transition-colors"
-                                  title="Quitar video"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
                             );
@@ -1700,60 +1535,6 @@ export default function App() {
                             <p className="text-center text-xs text-natural-text-muted py-8">No hay videos en la lista.</p>
                           )}
                         </div>
-                      </div>
-
-                      {/* Add Video Form */}
-                      <div className="bg-gradient-to-b from-natural-cream to-natural-sand p-5 rounded-3xl border border-natural-border shadow-3xs">
-                        <h4 className="font-serif text-xs font-bold text-natural-dark uppercase tracking-widest border-b pb-2 border-natural-border/60 mb-3">
-                          Sube un nuevo Enlace
-                        </h4>
-                        
-                        <form onSubmit={handleAddVideo} className="space-y-3">
-                          <div>
-                            <label className="block text-[10px] uppercase tracking-wider font-bold text-natural-primary mb-1">Título del Video o Playlist</label>
-                            <input
-                              type="text"
-                              value={newVideoTitle}
-                              onChange={(e) => setNewVideoTitle(e.target.value)}
-                              placeholder="Ej: Playlist de Música Reiki o Meditación"
-                              className="w-full text-xs p-2.5 rounded-xl border border-natural-border bg-white text-natural-dark font-sans placeholder-natural-text-muted bg-white focus:outline-none focus:ring-1 focus:ring-natural-primary"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-[10px] uppercase tracking-wider font-bold text-natural-primary mb-1">Enlace de YouTube (Video o Playlist) o Vimeo</label>
-                            <input
-                              type="text"
-                              value={newVideoUrl}
-                              onChange={(e) => setNewVideoUrl(e.target.value)}
-                              placeholder="https://youtube.com/playlist?list=... o vimeo.com/..."
-                              className="w-full text-xs p-2.5 rounded-xl border border-natural-border bg-white text-natural-dark font-sans placeholder-natural-text-muted bg-white focus:outline-none focus:ring-1 focus:ring-natural-primary"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-[10px] uppercase tracking-wider font-bold text-natural-primary mb-1">Breve Descripción (Opcional)</label>
-                            <textarea
-                              value={newVideoDesc}
-                              onChange={(e) => setNewVideoDesc(e.target.value)}
-                              placeholder="Instrucciones sobre cómo acompañar el video..."
-                              rows={2}
-                              className="w-full text-xs p-2.5 rounded-xl border border-natural-border bg-white text-natural-dark font-sans placeholder-natural-text-muted bg-white focus:outline-none focus:ring-1 focus:ring-natural-primary resize-none"
-                            ></textarea>
-                          </div>
-
-                          {videoError && (
-                            <p className="text-[11px] text-red-500 font-medium leading-normal bg-red-50 border border-red-100 p-2 rounded-xl">{videoError}</p>
-                          )}
-
-                          <button
-                            type="submit"
-                            className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-natural-primary text-natural-bg rounded-xl text-xs font-semibold hover:bg-natural-primary/95 transition-all shadow-sm cursor-pointer"
-                          >
-                            <Plus className="w-3.5 h-3.5" />
-                            <span>Agregar Video</span>
-                          </button>
-                        </form>
                       </div>
                     </div>
                   </div>
