@@ -1,0 +1,6 @@
+{
+  "name": "Gokuikaiden - Maestría Reiki",
+  "description": "Manual interactivo interactivo de Maestría de Reiki Tradicional Japonés (Gokuikaiden) - Clase 1 y Test de Evaluación.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
