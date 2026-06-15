@@ -1582,10 +1582,10 @@ export default function App() {
 
                   <div className="text-natural-text-muted text-sm leading-relaxed space-y-3">
                     <p>
-                      La Maestría en Reiki no es una meta que se obtiene de la noche a la mañana, sino un sendero sin fin. Esta aplicación interactiva cubre con devoción la <strong className="text-natural-dark">Clase I de Gokuikaiden</strong>, ofreciendo las bases tradicionales sólidas.
+                      La Maestría en Reiki no es una meta que se obtiene de la noche a la mañana, sino un sendero sin fin. Esta aplicación interactiva cubre la <strong className="text-natural-dark">Clase I de Gokuikaiden</strong>, ofreciendo las bases tradicionales sólidas.
                     </p>
                     <p>
-                      A continuación, descubre la hoja de ruta y planificación didáctica del manual para que puedas vislumbrar cómo crecerá tu canal energético en las clases venideras de Reiki Tradicional Japonés de nuestra escuela:
+                      A continuación, descubrí la hoja de ruta y planificación didáctica del manual para que puedas vislumbrar los temas que se vienen en la próxima entrega:
                     </p>
                   </div>
 
