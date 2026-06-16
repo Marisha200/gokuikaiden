@@ -1445,7 +1445,7 @@ export default function App() {
                     <div className="flex items-center gap-3">
                       <Video className="w-6 h-6 text-natural-primary" />
                       <h3 className="text-xl sm:text-2xl font-serif text-natural-dark font-bold">
-                        Videos de Práctica - Rincón Zen
+                        Videos y Material en PDF
                       </h3>
                     </div>
                     <span className="text-[10px] px-2.5 py-0.5 bg-natural-cream text-natural-primary rounded-md uppercase tracking-wider font-mono font-semibold">
