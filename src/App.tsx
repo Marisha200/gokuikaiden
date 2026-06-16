@@ -40,7 +40,8 @@ import {
   Youtube,
   Play,
   Plus,
-  Trash2
+  Trash2,
+  FileText
 } from "lucide-react";
 
 import {
@@ -77,6 +78,42 @@ export default function App() {
         description: "No te olvides de hacer click en CC para verlo en español.",
         url: "https://vimeo.com/96606036"
       }
+    ];
+  });
+
+  // =========================================================================
+  // DOCUMENTOS Y MANUALES PDF DESCARGABLES (DESDE GOOGLE DRIVE)
+  // Reemplaza los enlaces de "url" con tus URLs reales de Google Drive.
+  // Cualquier alumno podrá hacer clic en "Descargar" y obtener el documento.
+  // =========================================================================
+  const [downloadableDocs] = useState<{ id: string; title: string; description: string; url: string }[]>(() => {
+    return [
+      {
+        id: "influencias-en-reiki",
+        title: "Influencias en Reiki",
+        description: "Material de estudio sobre las influencias en Reiki Tradicional Japonés.",
+        url: "https://drive.google.com/file/d/1ofv5hI9S7fvRXsya0yDgF3k_UgF51fQd/view?usp=sharing"
+      }
+      // =========================================================================
+      // ¡APRENDE A AGREGAR MÁS DOCUMENTOS DE GOOGLE DRIVE AQUÍ! ✨
+      // =========================================================================
+      // En React/TypeScript, cada documento nuevo debe escribirse entre llaves { ... }
+      // y estar separado del documento anterior por una COMA ( , ).
+      //
+      // Para ACTIVAR el documento que ocultamos abajo, solo quita el "/*" de arriba y el "*/" del final.
+      //
+      // Para AGREGAR un nuevo documento:
+      // Copia el formato de abajo, pon una coma después del de arriba, y reemplaza los textos y la URL de Google Drive.
+      // (Asegúrate de que en Google Drive el documento esté compartido como "Cualquier persona con el enlace puede ver").
+      /*
+      ,
+      {
+        id: "simbolos-sagrados-maestria",
+        title: "Símbolos y Kotodamas de Cuarto Nivel",
+        description: "Trazado formal, significado trascendental, activación y meditación activa de sintonías.",
+        url: "https://drive.google.com/file/d/1_REEMPLAZAR_CON_OTRO_ID_DE_DRIVE_SI_QUISIERAS/view?usp=sharing"
+      }
+      */
     ];
   });
 
@@ -1536,6 +1573,48 @@ export default function App() {
                           )}
                         </div>
                       </div>
+
+                      {/* Documentos de Lectura & Manuales PDF (Descargas desde Google Drive) */}
+                      <div className="bg-gradient-to-b from-natural-cream/80 to-natural-sand/50 p-5 rounded-3xl border border-natural-border shadow-3xs space-y-3">
+                        <h4 className="font-serif text-xs font-bold text-natural-dark uppercase tracking-widest border-b pb-2 border-natural-border/60 flex items-center gap-1.5">
+                          <FileText className="w-4 h-4 text-natural-primary" />
+                          Manuales en PDF ({downloadableDocs.length})
+                        </h4>
+                        
+                        <p className="text-[11px] text-natural-text-muted leading-relaxed">
+                          Puedes hacer clic para descargar o abrir el material de estudio directo desde Google Drive:
+                        </p>
+
+                        <div className="space-y-3 pt-1">
+                          {downloadableDocs.map((doc) => (
+                            <div 
+                              key={doc.id}
+                              className="bg-white p-3 rounded-2xl border border-natural-border/60 hover:border-natural-primary/55 transition-all shadow-3xs group flex flex-col justify-between"
+                            >
+                              <div>
+                                <span className="text-[11px] font-bold text-natural-dark block group-hover:text-natural-primary transition-colors leading-normal">
+                                  {doc.title}
+                                </span>
+                                <p className="text-[10px] text-natural-text-muted/90 mt-1 leading-normal">
+                                  {doc.description}
+                                </p>
+                              </div>
+                              
+                              <div className="mt-3 flex justify-end">
+                                <a
+                                  href={doc.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-natural-sand hover:bg-natural-primary/10 rounded-lg text-[10px] uppercase tracking-wider font-bold text-natural-primary transition-colors focus:outline-none border border-natural-border/40 hover:border-natural-primary/30"
+                                >
+                                  <Download className="w-3.5 h-3.5" />
+                                  <span>Descargar Manual</span>
+                                </a>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -1582,10 +1661,10 @@ export default function App() {
 
                   <div className="text-natural-text-muted text-sm leading-relaxed space-y-3">
                     <p>
-                      La Maestría en Reiki no es una meta que se obtiene de la noche a la mañana, sino un sendero sin fin. Esta aplicación interactiva cubre la <strong className="text-natural-dark">Clase I de Gokuikaiden</strong>, ofreciendo las bases tradicionales sólidas.
+                      La Maestría en Reiki no es una meta que se obtiene de la noche a la mañana, sino un sendero sin fin. Esta aplicación interactiva cubre con devoción la <strong className="text-natural-dark">Clase I de Gokuikaiden</strong>, ofreciendo las bases tradicionales sólidas.
                     </p>
                     <p>
-                      A continuación, descubrí la hoja de ruta y planificación didáctica del manual para que puedas vislumbrar los temas que se vienen en la próxima entrega:
+                      A continuación, descubre la hoja de ruta y planificación didáctica del manual para que puedas vislumbrar cómo crecerá tu canal energético en las clases venideras de Reiki Tradicional Japonés de nuestra escuela:
                     </p>
                   </div>
 
@@ -1676,3 +1755,4 @@ export default function App() {
     </div>
   );
 }
+
