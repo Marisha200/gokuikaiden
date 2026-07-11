@@ -56,6 +56,20 @@ import {
   RET_QUIZ_QUESTIONS
 } from "./data/manualContent";
 
+import {
+  CLASS2_INTRO,
+  CLASS2_TREASURES,
+  CLASS2_DANTIENS,
+  CLASS2_MICRO_ORBIT,
+  CLASS2_JUNG_SYMBOLISM,
+  CLASS2_TRILOGY_MAPPING,
+  CLASS2_TRIVIA_QUESTIONS
+} from "./data/class2Content";
+
+import choKuReiImg from "./assets/images/cho_ku_rei_1783782332885.jpg";
+import seiHeKiImg from "./assets/images/sei_he_ki_1783782344312.jpg";
+import honShaZeShoNenImg from "./assets/images/hon_sha_ze_sho_nen_1783782356618.jpg";
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>("bienvenida");
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
@@ -118,6 +132,62 @@ export default function App() {
   });
 
   const [selectedVideoId, setSelectedVideoId] = useState<string>("PL0g9expKbVYIsIq5LNskW-C44imC4sdvS");
+
+  // Videos oficiales para la Clase II
+  const [customVideos2] = useState<{ id: string; title: string; description: string; url: string; type?: "youtube" | "vimeo" | "youtube_playlist" }[]>(() => {
+    return [
+      {
+        id: "PL0g9expKbVYIsIq5LNskW-C44imC4sdvS",
+        type: "youtube_playlist",
+        title: "Símbolos y Prácticas de Nivel II (Okuden)",
+        description: "Lista de reproducción sugerida para acompañar el trazado de símbolos de Nivel II y las meditaciones energéticas.",
+        url: "https://www.youtube.com/watch?v=8F1tIfEnh-8&list=PL0g9expKbVYIsIq5LNskW-C44imC4sdvS&index=1"
+      }
+    ];
+  });
+
+  // Documentos y Manuales PDF para la Clase II
+  const [downloadableDocs2] = useState<{ id: string; title: string; description: string; url: string }[]>(() => {
+    return [
+      {
+        id: "manual-reiki-nivel-2-okuden",
+        title: "Manual de Reiki Nivel II - El Camino Interior",
+        description: "Material oficial para profundizar en los Tres Tesoros, los Dantians, la Órbita Microcósmica y los Símbolos Sagrados.",
+        url: "https://drive.google.com/file/d/1ofv5hI9S7fvRXsya0yDgF3k_UgF51fQd/view?usp=sharing"
+      }
+    ];
+  });
+
+  const [selectedVideoId2, setSelectedVideoId2] = useState<string>("PL0g9expKbVYIsIq5LNskW-C44imC4sdvS");
+
+  // Class Selection States
+  const [selectedClass, setSelectedClass] = useState<number>(1);
+
+  // Class 2 Quiz States
+  const [c2QuizAnswers, setC2QuizAnswers] = useState<Record<number, number>>({});
+  const [c2AnswersSubmitted, setC2AnswersSubmitted] = useState<boolean>(false);
+  const [c2ShowResults, setC2ShowResults] = useState<boolean>(false);
+  const [c2DiplomaName, setC2DiplomaName] = useState<string>("");
+  const [c2ViewingDiploma, setC2ViewingDiploma] = useState<boolean>(false);
+
+  // Class 2 Interactive Matching Game States
+  const [matchingChecked, setMatchingChecked] = useState<boolean>(false);
+  const [matchingScore, setMatchingScore] = useState<number>(0);
+  const [selectedDeityGuess, setSelectedDeityGuess] = useState<Record<string, string>>({
+    "cho-ku-rei": "",
+    "sei-he-ki": "",
+    "hon-sha-ze-sho-nen": ""
+  });
+  const [selectedPlaneGuess, setSelectedPlaneGuess] = useState<Record<string, string>>({
+    "cho-ku-rei": "",
+    "sei-he-ki": "",
+    "hon-sha-ze-sho-nen": ""
+  });
+  const [selectedArchetypeGuess, setSelectedArchetypeGuess] = useState<Record<string, string>>({
+    "cho-ku-rei": "",
+    "sei-he-ki": "",
+    "hon-sha-ze-sho-nen": ""
+  });
 
   // Diagnostic Simulator State
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
@@ -187,7 +257,7 @@ export default function App() {
     window.print();
   };
 
-  const menuItems = [
+  const menuItems1 = [
     { id: "bienvenida", label: "Inicio", icon: Flower2 },
     { id: "kanji", label: "El Kanji Reiki", icon: Sparkles },
     { id: "principios", label: "El Gokai (Principios)", icon: Sun },
@@ -197,6 +267,29 @@ export default function App() {
     { id: "test", label: "Test Evaluativo", icon: Award },
     { id: "roadmap", label: "Progreso y Futuro", icon: BookOpen }
   ];
+
+  const menuItems2 = [
+    { id: "c2_bienvenida", label: "Inicio", icon: Flower2 },
+    { id: "c2_tesoros", label: "Los 3 Tesoros", icon: Sparkles },
+    { id: "c2_dantien", label: "Dantien y Órbita", icon: Compass },
+    { id: "c2_simbolos", label: "Símbolos y Kurama", icon: Flame },
+    { id: "c2_jung", label: "Mirada de Jung", icon: ShieldAlert },
+    { id: "c2_videos", label: "Videos y Material", icon: Video },
+    { id: "c2_juegos", label: "Juegos Evaluativos", icon: Award }
+  ];
+
+  const menuItems = selectedClass === 1 ? menuItems1 : menuItems2;
+
+  const changeClass = (classNum: number) => {
+    setSelectedClass(classNum);
+    if (classNum === 1) {
+      setActiveTab("bienvenida");
+      markAsRead("bienvenida");
+    } else {
+      setActiveTab("c2_bienvenida");
+      markAsRead("c2_bienvenida");
+    }
+  };
 
   // Diagnosis simulator details
   const regions = [
@@ -362,16 +455,50 @@ export default function App() {
             <span className="text-natural-primary">Nivel de Maestría ● Reiki Tradicional Japonés</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-serif tracking-tight text-natural-dark font-semibold">
-            Gokuikaiden
+            {selectedClass === 1 ? "Gokuikaiden" : "El Mapa del Camino Interior"}
           </h2>
           <p className="mt-2 text-natural-text-muted text-sm sm:text-base italic max-w-xl mx-auto leading-relaxed">
-            &ldquo;La transmisión completa de los secretos esenciales. El camino para aprender, sanar y encender la chispa del Satori.&rdquo;
+            {selectedClass === 1 
+              ? "“La transmisión completa de los secretos esenciales. El camino para aprender, sanar y encender la chispa del Satori.”" 
+              : "“La integración del Taoísmo, Budismo, Shintō y Reiki Tradicional. La espiritualidad profunda como camino de transformación del ser.”"}
           </p>
- 
-
         </div>
       </section>
- 
+
+      {/* HORIZONTAL CLASS SELECTOR MENU */}
+      <div className="bg-natural-eggshell border-b border-natural-border py-4 print:hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
+            <span className="text-[10px] font-bold text-natural-primary uppercase tracking-widest mr-1 font-serif">Clase Activa:</span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => changeClass(1)}
+                className={`px-4 sm:px-5 py-2 rounded-2xl text-xs font-bold tracking-wide transition-all duration-300 flex items-center gap-2 border ${
+                  selectedClass === 1
+                    ? "bg-natural-primary text-white border-natural-primary shadow-xs scale-102"
+                    : "bg-white text-natural-dark hover:bg-natural-cream border-natural-border"
+                }`}
+              >
+                <Award className="w-3.5 h-3.5" />
+                <span>Clase I: Gokuikaiden</span>
+              </button>
+
+              <button
+                onClick={() => changeClass(2)}
+                className={`px-4 sm:px-5 py-2 rounded-2xl text-xs font-bold tracking-wide transition-all duration-300 flex items-center gap-2 border ${
+                  selectedClass === 2
+                    ? "bg-natural-primary text-white border-natural-primary shadow-xs scale-102"
+                    : "bg-white text-natural-dark hover:bg-natural-cream border-natural-border"
+                }`}
+              >
+                <Compass className="w-3.5 h-3.5" />
+                <span>Clase II: Camino Interior</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* MAIN LAYOUT */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col lg:flex-row gap-8">
         
@@ -380,7 +507,7 @@ export default function App() {
           <div className="sticky top-24 space-y-6">
             <div className="bg-white p-5 rounded-2xl border border-natural-border shadow-xs">
               <h3 className="text-xs font-bold font-serif text-natural-primary tracking-wider mb-4 uppercase">
-                Temas de Clase 1
+                {selectedClass === 1 ? "Temas de Clase I" : "Temas de Clase II"}
               </h3>
 
               <div className="space-y-1.5">
@@ -425,18 +552,20 @@ export default function App() {
                 <span className="font-serif text-xs font-bold tracking-widest uppercase">Tu Progreso</span>
               </div>
               <p className="text-natural-text-muted text-[11px] leading-relaxed mb-3">
-                Lee detenidamente cada sección de las enseñanzas para habilitar la evaluación de Maestría final.
+                {selectedClass === 1 
+                  ? "Lee detenidamente cada sección de las enseñanzas para habilitar la evaluación de Maestría final."
+                  : "Explora los Tres Tesoros, los Dantians y la simbología para jugar el Test Evaluativo de Clase II."}
               </p>
               
               <div className="space-y-1.5">
                 <div className="flex justify-between text-[11px] text-natural-text-muted/80 font-mono">
                   <span>Módulos vistos:</span>
-                  <span>{Object.keys(readSections).length} de {menuItems.length}</span>
+                  <span>{menuItems.filter(item => readSections[item.id]).length} de {menuItems.length}</span>
                 </div>
                 <div className="w-full bg-natural-border/60 rounded-full h-1.5 overflow-hidden">
                   <div
                     className="bg-natural-secondary h-1.5 rounded-full transition-all duration-300"
-                    style={{ width: `${(Object.keys(readSections).length / menuItems.length) * 100}%` }}
+                    style={{ width: `${(menuItems.filter(item => readSections[item.id]).length / menuItems.length) * 100}%` }}
                   />
                 </div>
               </div>
@@ -1445,7 +1574,7 @@ export default function App() {
                     <div className="flex items-center gap-3">
                       <Video className="w-6 h-6 text-natural-primary" />
                       <h3 className="text-xl sm:text-2xl font-serif text-natural-dark font-bold">
-                        Videos y Material en PDF
+                        Videos y Material en PDF 
                       </h3>
                     </div>
                     <span className="text-[10px] px-2.5 py-0.5 bg-natural-cream text-natural-primary rounded-md uppercase tracking-wider font-mono font-semibold">
@@ -1728,6 +1857,1127 @@ export default function App() {
                 </div>
               )}
 
+              {/* === TABS CLASE II: BIENVENIDA === */}
+              {activeTab === "c2_bienvenida" && (
+                <div className="space-y-6 animate-fade-in">
+                  <div className="flex items-center justify-between border-b pb-4 border-natural-border">
+                    <div className="flex items-center gap-3">
+                      <Flower2 className="w-6 h-6 text-natural-primary" />
+                      <h3 className="text-xl sm:text-2xl font-serif text-natural-dark font-bold">
+                        {CLASS2_INTRO.title}
+                      </h3>
+                    </div>
+                    <span className="text-[10px] px-2.5 py-0.5 bg-natural-cream text-natural-primary rounded-md uppercase tracking-wider font-mono font-semibold">
+                      Camino Interior
+                    </span>
+                  </div>
+
+                  <div className="bg-[#f5f2e9] p-6 rounded-3xl border border-[#e8e4d8] shadow-sm relative overflow-hidden">
+                    <div className="absolute right-4 top-4 text-natural-primary pointer-events-none">
+                      <Flower2 className="w-24 h-24 stroke-1 opacity-10" />
+                    </div>
+                    <p className="text-natural-dark font-serif italic text-sm sm:text-base leading-relaxed relative z-10">
+                      &ldquo;{CLASS2_INTRO.intro}&rdquo;
+                    </p>
+                    <div className="mt-3 text-right">
+                      <span className="text-xs font-mono text-natural-primary font-semibold">
+                        {CLASS2_INTRO.concept}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h4 className="font-serif text-base font-bold text-natural-dark">
+                      Los Puentes de las Grandes Tradiciones de Oriente:
+                    </h4>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {CLASS2_INTRO.bridges.map((bridge, idx) => (
+                        <div key={idx} className="p-5 rounded-2xl border border-natural-border hover:border-natural-primary/45 transition-all bg-natural-eggshell/40 shadow-3xs flex flex-col justify-between">
+                          <span className="text-xs font-serif text-natural-primary uppercase tracking-widest font-bold">
+                            {bridge.tradition}
+                          </span>
+                          <p className="text-xs text-natural-text-muted mt-2">
+                            Apunta hacia: <strong className="text-natural-dark">{bridge.path}</strong>
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="p-6 border border-natural-border bg-natural-cream/30 rounded-2xl text-xs text-natural-text-muted leading-relaxed">
+                      <p className="font-semibold text-natural-primary mb-2">✦ La Integración en Reiki:</p>
+                      <p>
+                        Mikao Usui estudió profundamente estas corrientes filosóficas. Reiki no nació en el vacío, sino en un Japón impregnado de la devoción del Shintō, la alquimia corporal y meditación del Taoísmo, y el vacío compasivo del Budismo Zen. Al comprender estas raíces, la práctica de Reiki trasciende el simple tratamiento de imposición de manos y se convierte en un mapa sagrado de despertar personal.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-4 border-t border-natural-border">
+                    <button
+                      onClick={() => {
+                        setActiveTab("c2_tesoros");
+                        markAsRead("c2_tesoros");
+                      }}
+                      className="inline-flex items-center space-x-1.5 px-5 py-2.5 bg-natural-primary text-white rounded-xl text-xs font-semibold hover:bg-natural-primary/95 transition-colors shadow-sm"
+                    >
+                      <span>Los 3 Tesoros</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* === TABS CLASE II: LOS 3 TESOROS === */}
+              {activeTab === "c2_tesoros" && (
+                <div className="space-y-6 animate-fade-in">
+                  <div className="flex items-center justify-between border-b pb-4 border-natural-border">
+                    <div className="flex items-center gap-3">
+                      <Sparkles className="w-6 h-6 text-natural-primary" />
+                      <h3 className="text-xl sm:text-2xl font-serif text-natural-dark font-bold">
+                        Los Tres Tesoros del Taoísmo (San Bao)
+                      </h3>
+                    </div>
+                    <span className="text-[10px] px-2.5 py-0.5 bg-natural-cream text-natural-primary rounded-md uppercase tracking-wider font-mono font-semibold">
+                      Alquimia Interna
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-natural-text-muted leading-relaxed">
+                    El Taoísmo considera que el ser humano posee tres grandes tesoros o manifestaciones de la energía. No son tres fuerzas independientes, sino tres niveles vibratorios de la misma corriente vital que nos conecta con el Cosmos:
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {CLASS2_TREASURES.map((treasure, idx) => (
+                      <div 
+                        key={idx} 
+                        className="bg-white p-5 rounded-2xl border border-natural-border hover:border-natural-primary/50 transition-all shadow-3xs flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex justify-between items-center mb-3">
+                            <span className="text-2xl font-bold font-serif text-natural-primary">{treasure.kanji}</span>
+                            <span className="text-[10px] font-mono uppercase font-bold tracking-wider px-2 py-0.5 bg-natural-cream text-natural-primary rounded">{treasure.name}</span>
+                          </div>
+                          <h4 className="text-sm font-serif font-bold text-natural-dark">{treasure.romaji}</h4>
+                          <p className="text-[11px] text-natural-primary/80 italic mt-0.5">{treasure.translation}</p>
+                          <p className="text-xs text-natural-text-muted mt-3 leading-relaxed">{treasure.description}</p>
+                        </div>
+
+                        <div className="mt-5 pt-3 border-t border-natural-border/60">
+                          <p className="text-[10px] uppercase font-mono tracking-wider font-bold text-natural-dark/70 mb-1.5">Correspondencias:</p>
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {treasure.associations.map((assoc, aIdx) => (
+                              <span key={aIdx} className="text-[9px] font-mono bg-natural-eggshell border border-natural-border px-1.5 py-0.5 rounded text-natural-text-muted">
+                                {assoc}
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-[11px] text-natural-text-muted">
+                            <strong className="text-natural-dark font-serif">Arquetipo:</strong> {treasure.archetype}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="p-5 border border-natural-border bg-gradient-to-br from-natural-cream/40 to-natural-sand/35 rounded-2xl text-xs text-natural-text-muted leading-relaxed space-y-2">
+                    <p className="font-semibold text-natural-primary">✦ La Alquimia de la Práctica:</p>
+                    <p>
+                      En el autotratamiento o sintonización de Reiki, nutrimos el <strong className="text-natural-dark">Jing</strong> mediante el descanso y la conexión con la Tierra, dinamizamos nuestro <strong className="text-natural-dark">Qi</strong> guiando el aliento consciente (respiración Tanden), y despertamos el <strong className="text-natural-dark">Shen</strong> reposando en la meditación silenciosa (Gassho).
+                    </p>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-4 border-t border-natural-border">
+                    <button
+                      onClick={() => {
+                        setActiveTab("c2_bienvenida");
+                        markAsRead("c2_bienvenida");
+                      }}
+                      className="inline-flex items-center space-x-1 px-4 py-2 bg-natural-cream hover:bg-natural-sand rounded-xl text-xs font-semibold text-natural-dark transition shadow-2xs"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Volver</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setActiveTab("c2_dantien");
+                        markAsRead("c2_dantien");
+                      }}
+                      className="inline-flex items-center space-x-1.5 px-5 py-2.5 bg-natural-primary text-white rounded-xl text-xs font-semibold hover:bg-natural-primary/95 transition-colors shadow-sm"
+                    >
+                      <span>Dantians y Órbita</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* === TABS CLASE II: DANTIENS Y ORBITA === */}
+              {activeTab === "c2_dantien" && (
+                <div className="space-y-6 animate-fade-in">
+                  <div className="flex items-center justify-between border-b pb-4 border-natural-border">
+                    <div className="flex items-center gap-3">
+                      <Compass className="w-6 h-6 text-natural-primary" />
+                      <h3 className="text-xl sm:text-2xl font-serif text-natural-dark font-bold">
+                        Los Tres Dantians y la Órbita Microcósmica
+                      </h3>
+                    </div>
+                    <span className="text-[10px] px-2.5 py-0.5 bg-natural-cream text-natural-primary rounded-md uppercase tracking-wider font-mono font-semibold">
+                      Fisiología Energética
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-natural-text-muted leading-relaxed">
+                    Dantian significa literalmente <strong className="text-natural-dark">&ldquo;Campo del Elixir&rdquo;</strong>. Son tres grandes centros energéticos de transformación alquímica situados a lo largo de nuestro eje central corporal:
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {CLASS2_DANTIENS.map((dantian, idx) => (
+                      <div key={idx} className="p-5 rounded-2xl border border-natural-border bg-white shadow-3xs hover:border-natural-primary/50 transition-all flex flex-col justify-between">
+                        <div>
+                          <h4 className="font-serif text-sm font-bold text-natural-dark flex items-center gap-1.5 border-b pb-2 border-natural-border/60">
+                            <span className="w-2 h-2 rounded-full bg-natural-primary" />
+                            {dantian.name}
+                          </h4>
+                          <p className="text-[10px] text-natural-primary font-mono mt-1.5">📍 {dantian.location}</p>
+                          <p className="text-xs text-natural-text-muted mt-3 leading-relaxed">{dantian.description}</p>
+                        </div>
+                        <div className="mt-5 pt-3 border-t border-natural-border/60">
+                          <p className="text-[10px] uppercase font-mono tracking-wider font-bold text-natural-dark/70 mb-1">Cualidades:</p>
+                          <ul className="text-xs text-natural-text-muted space-y-1 pl-3 list-disc">
+                            {dantian.represents.map((rep, rIdx) => (
+                              <li key={rIdx}>{rep}</li>
+                            ))}
+                          </ul>
+                          <p className="text-[11px] text-natural-primary font-serif italic mt-3">
+                            <strong>Rol:</strong> {dantian.role}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Microcosmic Orbit Section */}
+                  <div className="p-6 border border-natural-border rounded-2xl bg-gradient-to-br from-natural-eggshell to-natural-cream/50 space-y-4">
+                    <h4 className="font-serif text-sm font-bold text-natural-primary">
+                      {CLASS2_MICRO_ORBIT.title}
+                    </h4>
+                    <p className="text-xs text-natural-text-muted leading-relaxed">
+                      {CLASS2_MICRO_ORBIT.description}
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                      {CLASS2_MICRO_ORBIT.meridians.map((meridian, idx) => (
+                        <div key={idx} className="bg-white p-4 rounded-xl border border-natural-border">
+                          <span className="text-xs font-mono font-bold text-natural-primary uppercase tracking-widest">{meridian.name}</span>
+                          <p className="text-xs text-natural-text-muted mt-1 leading-relaxed">{meridian.description}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="text-xs text-natural-text-muted italic border-t pt-3 border-natural-border/50">
+                      <strong>💡 Práctica recomendada:</strong> Visualiza la luz circulando por el canal posterior (Du Mai) al inhalar, y descendiendo por el canal anterior (Ren Mai) al exhalar. Esta es la base de la respiración purificadora de Reiki tradicional.
+                    </p>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-4 border-t border-natural-border">
+                    <button
+                      onClick={() => {
+                        setActiveTab("c2_tesoros");
+                        markAsRead("c2_tesoros");
+                      }}
+                      className="inline-flex items-center space-x-1 px-4 py-2 bg-natural-cream hover:bg-natural-sand rounded-xl text-xs font-semibold text-natural-dark transition shadow-2xs"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Volver</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setActiveTab("c2_simbolos");
+                        markAsRead("c2_simbolos");
+                      }}
+                      className="inline-flex items-center space-x-1.5 px-5 py-2.5 bg-natural-primary text-white rounded-xl text-xs font-semibold hover:bg-natural-primary/95 transition-colors shadow-sm"
+                    >
+                      <span>Símbolos y Kurama</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* === TABS CLASE II: SIMBOLOS Y DEIDADES === */}
+              {activeTab === "c2_simbolos" && (
+                <div className="space-y-6 animate-fade-in">
+                  <div className="flex items-center justify-between border-b pb-4 border-natural-border">
+                    <div className="flex items-center gap-3">
+                      <Flame className="w-6 h-6 text-natural-primary" />
+                      <h3 className="text-xl sm:text-2xl font-serif text-natural-dark font-bold">
+                        Los Símbolos de Reiki y la Tríada del Monte Kurama
+                      </h3>
+                    </div>
+                    <span className="text-[10px] px-2.5 py-0.5 bg-natural-cream text-natural-primary rounded-md uppercase tracking-wider font-mono font-semibold">
+                      Simbología Cósmica
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-natural-text-muted leading-relaxed">
+                    Los símbolos de Reiki no son dibujos vacíos, son portales arquetípicos de conciencia. Cada uno vibra en correspondencia directa con las tres divinidades que conforman el <strong className="text-natural-dark">Sonten</strong> (la Suprema Conciencia del Universo) venerada en el Monte Kurama, donde Mikao Usui alcanzó el Satori:
+                  </p>
+
+                  {/* Symbol Cards */}
+                  <div className="space-y-8">
+                    {[
+                      {
+                        id: "cho-ku-rei",
+                        name: "Cho Ku Rei",
+                        japanese: "超空靈",
+                        romaji: "Símbolo del Poder y Manifestación",
+                        translation: "Llamar a la energía aquí y ahora",
+                        history: "Es el primer símbolo que se enseña tradicionalmente. Representa la materialización de la fuerza espiritual en la realidad terrenal.",
+                        symbolism: "Simbología de descenso cósmico, un conector vertical entre el Cielo (espíritu) y la Tierra (materia) que culmina en un hélice espiral de enraizamiento.",
+                        deity: "Goho Mao Son",
+                        deityOrigin: "Fuerza / Voluntad",
+                        deityRole: "Fuerza de voluntad cósmica, poder protector, acción y transformación material.",
+                        plane: "Tierra",
+                        archetype: "El Guerrero Luminoso / El Constructor",
+                        imageSrc: choKuReiImg,
+                        color: "border-[#C29B38]/30 bg-amber-50/10"
+                      },
+                      {
+                        id: "sei-he-ki",
+                        name: "Sei He Ki",
+                        japanese: "聖平己",
+                        romaji: "Símbolo de la Armonía Mental-Emocional",
+                        translation: "La unificación de la mente y las emociones",
+                        history: "Utilizado para sanar adicciones, fobias, desarreglos emocionales y reconciliar opuestos en el plano inconsciente.",
+                        symbolism: "Integración equilibrada del cerebro izquierdo (trazado lineal) y derecho (trazado ondulado). Armonía perfecta.",
+                        deity: "Senju Kannon",
+                        deityOrigin: "Compasión / Amor",
+                        deityRole: "Compasión infinita, amor incondicional, curación psicológica y contención sutil.",
+                        plane: "Luna",
+                        archetype: "La Madre Universal / La Compasión",
+                        imageSrc: seiHeKiImg,
+                        color: "border-[#5B9DA2]/30 bg-teal-50/10"
+                      },
+                      {
+                        id: "hon-sha-ze-sho-nen",
+                        name: "Hon Sha Ze Shō Nen",
+                        japanese: "本者是正念",
+                        romaji: "Símbolo de Conexión sin Distancia",
+                        translation: "La naturaleza original es el pensamiento recto",
+                        history: "Símbolo para tratamientos remotos o a través del tiempo. Nos enseña que el espacio y el tiempo son ilusiones de la conciencia.",
+                        symbolism: "Una intrincada caligrafía kanji tradicional que representa la alineación de la columna de chakras y la conexión trascendental con el sol de la conciencia.",
+                        deity: "Bishamonten",
+                        deityOrigin: "Sabiduría / Luz",
+                        deityRole: "Sabiduría divina, responsabilidad espiritual, rectitud mental y abundancia luminosa.",
+                        plane: "Sol",
+                        archetype: "El Guardián / El Rey Justo",
+                        imageSrc: honShaZeShoNenImg,
+                        color: "border-[#C2735B]/30 bg-red-50/10"
+                      }
+                    ].map((symbol, idx) => (
+                      <div 
+                        key={idx} 
+                        className={`p-6 rounded-3xl border ${symbol.color} flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow duration-300 relative overflow-hidden bg-white`}
+                      >
+                        {/* Image Column */}
+                        <div className="w-full md:w-48 h-48 shrink-0 rounded-2xl overflow-hidden border border-natural-border shadow-2xs relative">
+                          <img 
+                            src={symbol.imageSrc} 
+                            alt={symbol.name} 
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute top-2 right-2 px-2 py-0.5 bg-black/50 text-white rounded font-mono text-[9px]">
+                            {symbol.plane}
+                          </div>
+                        </div>
+
+                        {/* Text Details */}
+                        <div className="flex-1 space-y-3">
+                          <div className="flex flex-wrap items-baseline justify-between gap-2 border-b pb-2 border-natural-border/60">
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-lg font-serif font-bold text-natural-dark">{symbol.name}</h4>
+                              <span className="text-sm font-bold font-serif text-natural-primary">({symbol.japanese})</span>
+                            </div>
+                            <span className="text-[10px] font-mono uppercase bg-natural-cream text-natural-primary px-2 py-0.5 rounded font-bold">
+                              Arquetipo: {symbol.archetype}
+                            </span>
+                          </div>
+
+                          <p className="text-xs text-natural-primary font-semibold font-serif">{symbol.romaji} — &ldquo;{symbol.translation}&rdquo;</p>
+                          <p className="text-xs text-natural-text-muted leading-relaxed">{symbol.history}</p>
+                          <p className="text-xs text-natural-text-muted leading-relaxed"><strong className="text-natural-dark">Simbolismo Profundo:</strong> {symbol.symbolism}</p>
+
+                          <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="p-3 rounded-xl bg-natural-eggshell/50 border border-natural-border/60">
+                              <span className="text-[9px] font-mono uppercase tracking-wider text-natural-primary font-bold block">Deidad de Kurama:</span>
+                              <span className="text-xs font-serif font-bold text-natural-dark block mt-0.5">{symbol.deity}</span>
+                              <span className="text-[10px] text-natural-text-muted">{symbol.deityOrigin} (Sonten)</span>
+                            </div>
+                            <div className="p-3 rounded-xl bg-natural-eggshell/50 border border-natural-border/60">
+                              <span className="text-[9px] font-mono uppercase tracking-wider text-natural-primary font-bold block">Acción Divina:</span>
+                              <span className="text-xs text-natural-text-muted leading-tight block mt-1">{symbol.deityRole}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Summary Comparison Matrix Table */}
+                  <div className="bg-white border border-natural-border rounded-2xl overflow-hidden shadow-3xs">
+                    <div className="p-4 bg-natural-cream/40 border-b border-natural-border">
+                      <h4 className="font-serif text-xs font-bold text-natural-dark uppercase tracking-wider">Tabla de Síntesis del Camino Interior</h4>
+                      <p className="text-[10px] text-natural-text-muted/80 leading-normal">Una lectura contemporánea integradora de las correspondencias tradicionales.</p>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="bg-natural-eggshell border-b border-natural-border font-mono text-[10px] text-natural-text-muted uppercase">
+                            <th className="p-3">Tradición Taoísta</th>
+                            <th className="p-3">Deidad de Kurama</th>
+                            <th className="p-3">Símbolo de Reiki</th>
+                            <th className="p-3">Plano Celestial</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-natural-border/60">
+                          {CLASS2_TRILOGY_MAPPING.map((row, idx) => (
+                            <tr key={idx} className="hover:bg-natural-cream/10 transition-colors">
+                              <td className="p-3 font-medium text-natural-dark">{row.taoism}</td>
+                              <td className="p-3 font-serif font-semibold text-natural-primary">{row.kurama}</td>
+                              <td className="p-3 font-serif font-bold text-natural-dark">{row.reiki}</td>
+                              <td className="p-3 font-mono text-[11px] text-natural-text-muted">{row.plane}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-4 border-t border-natural-border">
+                    <button
+                      onClick={() => {
+                        setActiveTab("c2_dantien");
+                        markAsRead("c2_dantien");
+                      }}
+                      className="inline-flex items-center space-x-1 px-4 py-2 bg-natural-cream hover:bg-natural-sand rounded-xl text-xs font-semibold text-natural-dark transition shadow-2xs"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Volver</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setActiveTab("c2_jung");
+                        markAsRead("c2_jung");
+                      }}
+                      className="inline-flex items-center space-x-1.5 px-5 py-2.5 bg-natural-primary text-white rounded-xl text-xs font-semibold hover:bg-natural-primary/95 transition-colors shadow-sm"
+                    >
+                      <span>La Mirada de Jung</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* === TABS CLASE II: LA MIRADA DE JUNG === */}
+              {activeTab === "c2_jung" && (
+                <div className="space-y-6 animate-fade-in">
+                  <div className="flex items-center justify-between border-b pb-4 border-natural-border">
+                    <div className="flex items-center gap-3">
+                      <ShieldAlert className="w-6 h-6 text-natural-primary" />
+                      <h3 className="text-xl sm:text-2xl font-serif text-natural-dark font-bold">
+                        {CLASS2_JUNG_SYMBOLISM.title}
+                      </h3>
+                    </div>
+                    <span className="text-[10px] px-2.5 py-0.5 bg-natural-cream text-natural-primary rounded-md uppercase tracking-wider font-mono font-semibold">
+                      Simbología y Psicología
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-natural-primary font-serif font-semibold italic">
+                    {CLASS2_JUNG_SYMBOLISM.subtitle}
+                  </p>
+
+                  <div className="space-y-4 text-xs text-natural-text-muted leading-relaxed">
+                    {CLASS2_JUNG_SYMBOLISM.paragraphs.map((p, idx) => (
+                      <p key={idx}>{p}</p>
+                    ))}
+                  </div>
+
+                  {/* Elegant Quote */}
+                  <div className="bg-natural-eggshell border-l-4 border-natural-primary p-6 rounded-r-2xl italic my-6 shadow-3xs relative overflow-hidden">
+                    <div className="absolute right-4 bottom-2 text-natural-primary/5 select-none font-serif text-7xl font-bold">
+                      &ldquo;
+                    </div>
+                    <p className="text-natural-dark font-serif text-sm leading-relaxed relative z-10">
+                      &ldquo;{CLASS2_JUNG_SYMBOLISM.quote}&rdquo;
+                    </p>
+                    <p className="text-[10px] font-mono text-natural-primary font-bold text-right mt-2 uppercase tracking-wider">
+                      - {CLASS2_JUNG_SYMBOLISM.author}
+                    </p>
+                  </div>
+
+                  <div className="p-5 border border-natural-border bg-gradient-to-br from-natural-cream/30 to-natural-sand/30 rounded-2xl text-xs text-natural-text-muted leading-relaxed">
+                    <p className="font-semibold text-natural-primary mb-1">✦ Símbolos como Herramientas Auto-Reguladoras:</p>
+                    <p>
+                      En lugar de concebir los símbolos de Reiki como sortilegios supersticiosos o dibujos estáticos, la psicología arquetípica nos invita a considerarlos como herramientas auto-reguladoras de la energía psíquica. Al trazar un Cho Ku Rei, encauzamos conscientemente la voluntad de arraigarnos. Al trazar Sei He Ki, sintonizamos con la compasión materna de nuestra propia mente inconsciente, reconciliando tensiones y dolores antiguos.
+                    </p>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-4 border-t border-natural-border">
+                    <button
+                      onClick={() => {
+                        setActiveTab("c2_simbolos");
+                        markAsRead("c2_simbolos");
+                      }}
+                      className="inline-flex items-center space-x-1 px-4 py-2 bg-natural-cream hover:bg-natural-sand rounded-xl text-xs font-semibold text-natural-dark transition shadow-2xs"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Volver</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setActiveTab("c2_videos");
+                        markAsRead("c2_videos");
+                      }}
+                      className="inline-flex items-center space-x-1.5 px-5 py-2.5 bg-natural-primary text-white rounded-xl text-xs font-semibold hover:bg-natural-primary/95 transition-colors shadow-sm"
+                    >
+                      <span>Videos y Material</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* === TABS CLASE II: VIDEOS Y DOCUMENTOS === */}
+              {activeTab === "c2_videos" && (
+                <div className="space-y-6 animate-fade-in">
+                  <div className="flex items-center justify-between border-b pb-4 border-natural-border">
+                    <div className="flex items-center gap-3">
+                      <Video className="w-6 h-6 text-natural-primary" />
+                      <h3 className="text-xl sm:text-2xl font-serif text-natural-dark font-bold">
+                        Videos y Material en PDF (Clase II)
+                      </h3>
+                    </div>
+                    <span className="text-[10px] px-2.5 py-0.5 bg-natural-cream text-natural-primary rounded-md uppercase tracking-wider font-mono font-semibold">
+                      Sintonía Audiovisual II
+                    </span>
+                  </div>
+
+                  <p className="text-natural-text-muted text-sm leading-relaxed">
+                    Acompaña tu instrucción teórica con recursos audiovisuales oficiales de la maestría para el Nivel II. Visualiza las listas de reproducción recomendadas y videos demostrativos seleccionados para tu formación de Okuden.
+                  </p>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left/Middle Column: Player & Active Video info */}
+                    <div className="lg:col-span-2 space-y-4">
+                      {selectedVideoId2 ? (
+                        <div className="bg-white p-4 rounded-3xl border border-natural-border shadow-3xs overflow-hidden">
+                          <div className="aspect-video w-full rounded-2xl overflow-hidden border border-natural-border bg-black">
+                            {customVideos2.find(v => v.id === selectedVideoId2)?.type === "vimeo" ? (
+                              <iframe
+                                className="w-full h-full"
+                                src={`https://player.vimeo.com/video/${selectedVideoId2}`}
+                                title="Reproductor de Rincón Zen (Vimeo)"
+                                frameBorder="0"
+                                allow="autoplay; fullscreen; picture-in-picture"
+                                allowFullScreen
+                              ></iframe>
+                            ) : customVideos2.find(v => v.id === selectedVideoId2)?.type === "youtube_playlist" ? (
+                              <iframe
+                                className="w-full h-full"
+                                src={`https://www.youtube.com/embed/videoseries?list=${selectedVideoId2}`}
+                                title="Reproductor de Rincón Zen (Playlist de YouTube)"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                              ></iframe>
+                            ) : (
+                              <iframe
+                                className="w-full h-full"
+                                src={`https://www.youtube.com/embed/${selectedVideoId2}`}
+                                title="Reproductor de Rincón Zen (YouTube)"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                              ></iframe>
+                            )}
+                          </div>
+                          
+                          {/* Selected Video Details */}
+                          {customVideos2.find(v => v.id === selectedVideoId2) && (
+                            <div className="mt-4">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-serif text-base text-natural-dark font-bold">
+                                  {customVideos2.find(v => v.id === selectedVideoId2)?.title}
+                                </span>
+                                <span className={`text-[9px] px-2 py-0.5 rounded font-mono font-bold uppercase ${
+                                  customVideos2.find(v => v.id === selectedVideoId2)?.type === "vimeo"
+                                    ? "bg-blue-100 text-blue-700"
+                                    : customVideos2.find(v => v.id === selectedVideoId2)?.type === "youtube_playlist"
+                                    ? "bg-purple-100 text-purple-700"
+                                    : "bg-red-100 text-red-700"
+                                }`}>
+                                  {customVideos2.find(v => v.id === selectedVideoId2)?.type === "vimeo" 
+                                    ? "Vimeo" 
+                                    : customVideos2.find(v => v.id === selectedVideoId2)?.type === "youtube_playlist"
+                                    ? "Playlist de YouTube"
+                                    : "YouTube Video"}
+                                </span>
+                              </div>
+                              <p className="text-xs text-natural-text-muted leading-relaxed whitespace-pre-line">
+                                {customVideos2.find(v => v.id === selectedVideoId2)?.description}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="bg-natural-sand/30 border border-dashed border-natural-border p-12 text-center rounded-3xl">
+                          <Video className="w-12 h-12 text-natural-primary/40 mx-auto mb-3" />
+                          <p className="text-sm text-natural-text-muted">Selecciona un video de la lista para comenzar la reproducción.</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right Column: Video list */}
+                    <div className="space-y-6">
+                      {/* Video List */}
+                      <div className="bg-white p-5 rounded-3xl border border-natural-border shadow-3xs space-y-3">
+                        <h4 className="font-serif text-xs font-bold text-natural-dark uppercase tracking-widest border-b pb-2 border-natural-border/60">
+                          Videos de la Maestría ({customVideos2.length})
+                        </h4>
+                        
+                        <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
+                          {customVideos2.map((video) => {
+                            const isSelected = selectedVideoId2 === video.id;
+                            const isVimeo = video.type === "vimeo";
+                            const isPlaylist = video.type === "youtube_playlist";
+                            return (
+                              <div
+                                key={video.id}
+                                className={`flex items-center justify-between p-2.5 rounded-xl border transition-all text-left ${
+                                  isSelected
+                                    ? "bg-natural-cream text-natural-primary border-natural-primary shadow-3xs font-medium"
+                                    : "bg-natural-eggshell hover:bg-natural-sand/30 border-natural-border/70 text-natural-dark"
+                                }`}
+                              >
+                                <button
+                                  onClick={() => setSelectedVideoId2(video.id)}
+                                  className="flex items-center gap-2.5 text-xs text-left w-full min-w-0"
+                                >
+                                  <div className={`p-1.5 rounded-lg shrink-0 ${isSelected ? "bg-natural-primary text-white" : "bg-natural-sand text-natural-primary"}`}>
+                                    <Play className="w-3.5 h-3.5 fill-current" />
+                                  </div>
+                                  <div className="flex flex-col min-w-0">
+                                    <span className="truncate pr-1 block font-semibold">{video.title}</span>
+                                    <span className="text-[9px] text-natural-text-muted/80 uppercase font-mono tracking-widest">
+                                      {isVimeo ? "Vimeo" : isPlaylist ? "Playlist de YT" : "YouTube Video"}
+                                    </span>
+                                  </div>
+                                </button>
+                              </div>
+                            );
+                          })}
+                          
+                          {customVideos2.length === 0 && (
+                            <p className="text-center text-xs text-natural-text-muted py-8">No hay videos en la lista.</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Documentos de Lectura & Manuales PDF */}
+                      <div className="bg-gradient-to-b from-natural-cream/80 to-natural-sand/50 p-5 rounded-3xl border border-natural-border shadow-3xs space-y-3">
+                        <h4 className="font-serif text-xs font-bold text-natural-dark uppercase tracking-widest border-b pb-2 border-natural-border/60 flex items-center gap-1.5">
+                          <FileText className="w-4 h-4 text-natural-primary" />
+                          Manuales en PDF ({downloadableDocs2.length})
+                        </h4>
+                        
+                        <p className="text-[11px] text-natural-text-muted leading-relaxed">
+                          Puedes hacer clic para descargar o abrir el material de estudio directo desde Google Drive:
+                        </p>
+
+                        <div className="space-y-3 pt-1">
+                          {downloadableDocs2.map((doc) => (
+                            <div 
+                              key={doc.id}
+                              className="bg-white p-3 rounded-2xl border border-natural-border/60 hover:border-natural-primary/55 transition-all shadow-3xs group flex flex-col justify-between"
+                            >
+                              <div>
+                                <span className="text-[11px] font-bold text-[#3D301E] block group-hover:text-natural-primary transition-colors leading-normal">
+                                  {doc.title}
+                                </span>
+                                <p className="text-[10px] text-natural-text-muted/90 mt-1 leading-normal">
+                                  {doc.description}
+                                </p>
+                              </div>
+                              
+                              <div className="mt-3 flex justify-end">
+                                <a
+                                  href={doc.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-natural-sand hover:bg-natural-primary/10 rounded-lg text-[10px] uppercase tracking-wider font-bold text-natural-primary transition-colors focus:outline-none border border-natural-border/40 hover:border-natural-primary/30"
+                                >
+                                  <Download className="w-3.5 h-3.5" />
+                                  <span>Descargar Manual</span>
+                                </a>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-4 border-t border-natural-border">
+                    <button
+                      onClick={() => {
+                        setActiveTab("c2_jung");
+                        markAsRead("c2_jung");
+                      }}
+                      className="inline-flex items-center space-x-1 px-4 py-2 bg-natural-cream hover:bg-natural-sand rounded-xl text-xs font-semibold text-natural-dark transition shadow-2xs"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      <span>Volver</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setActiveTab("c2_juegos");
+                        markAsRead("c2_juegos");
+                      }}
+                      className="inline-flex items-center space-x-1.5 px-5 py-2.5 bg-natural-primary text-white rounded-xl text-xs font-semibold hover:bg-natural-primary/95 transition-colors shadow-sm"
+                    >
+                      <span>Juegos Evaluativos</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* === TABS CLASE II: JUEGOS Y TRIVIA === */}
+              {activeTab === "c2_juegos" && (
+                <div className="space-y-6 animate-fade-in print:p-0">
+                  {c2ViewingDiploma ? (
+                    /* DIPLOMA ZONE */
+                    <div className="bg-[#FAF8F5] border-8 border-double border-[#C29B38] p-8 md:p-16 rounded-3xl text-center shadow-lg relative max-w-2xl mx-auto my-4 animate-fade-in print:border-8 print:shadow-none print:my-0">
+                      <div className="absolute inset-4 border border-[#C29B38]/30 pointer-events-none" />
+                      
+                      <div className="absolute top-6 left-6 right-6 flex justify-between text-xs font-mono text-[#C29B38]/70 print:hidden">
+                        <span>MAESTRÍA REIKI TRADICIONAL JAPONÉS</span>
+                        <span>CLASE II</span>
+                      </div>
+
+                      <div className="space-y-6 relative z-10">
+                        <Flower2 className="w-14 h-14 text-[#C29B38] mx-auto opacity-80" />
+                        
+                        <div className="space-y-2">
+                          <span className="font-serif text-[11px] tracking-widest text-[#C29B38] font-bold block uppercase">Diploma de Honor</span>
+                          <h2 className="text-3xl md:text-4xl font-serif text-natural-dark font-bold italic tracking-tight">
+                            Camino del Satori
+                          </h2>
+                        </div>
+
+                        <p className="font-serif text-xs italic text-natural-text-muted leading-relaxed max-w-md mx-auto">
+                          Se certifica con profundo honor, alegría y gratitud sintonizada que:
+                        </p>
+
+                        <p className="text-2xl sm:text-3xl font-serif text-natural-dark font-extrabold border-b border-[#C29B38]/30 pb-2 inline-block px-8">
+                          {c2DiplomaName || "Estudiante de Rincón Zen"}
+                        </p>
+
+                        <p className="text-xs text-natural-text-muted leading-relaxed max-w-md mx-auto">
+                          Ha completado exitosamente y con distinción las dinámicas de aprendizaje e integración de la <strong className="text-natural-dark">Clase II: El Mapa del Camino Interior</strong>. Demostrando pleno entendimiento de la circulación de los Tres Tesoros, los Tres Dantians, y la relación arquetípica de los Símbolos sagrados de Reiki con el Sonten y la psicología arquetípica.
+                        </p>
+
+                        <div className="pt-8 grid grid-cols-2 gap-8 border-t border-[#C29B38]/20 max-w-sm mx-auto">
+                          <div className="text-center space-y-1">
+                            <span className="text-[10px] font-mono text-natural-text-muted/65 uppercase tracking-wider block">Maestra Transmisora</span>
+                            <span className="text-xs font-serif font-bold text-natural-dark block">Marina</span>
+                            <span className="text-[9px] text-[#5ba27f] font-bold block">Rincón Zen</span>
+                          </div>
+                          <div className="text-center space-y-1">
+                            <span className="text-[10px] font-mono text-natural-text-muted/65 uppercase tracking-wider block">Fecha de Sintonía</span>
+                            <span className="text-xs font-serif font-bold text-natural-dark block">Julio, 2026</span>
+                            <span className="text-[9px] text-[#5ba27f] font-bold block">Conexión Universal</span>
+                          </div>
+                        </div>
+
+                        {/* Print/Back Buttons */}
+                        <div className="pt-6 flex flex-col sm:flex-row justify-center gap-3 print:hidden">
+                          <button
+                            onClick={() => window.print()}
+                            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-natural-primary text-white hover:bg-natural-primary/95 font-semibold text-xs rounded-xl shadow transition-colors"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            <span>Imprimir Diploma</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setC2ViewingDiploma(false);
+                            }}
+                            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-natural-cream text-natural-dark hover:bg-natural-sand font-semibold text-xs rounded-xl transition shadow-2xs"
+                          >
+                            <RotateCw className="w-3.5 h-3.5" />
+                            <span>Volver a los Juegos</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    /* NORMAL GAMES ZONE */
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between border-b pb-4 border-natural-border print:hidden">
+                        <div className="flex items-center gap-3">
+                          <Award className="w-6 h-6 text-natural-primary" />
+                          <h3 className="text-xl sm:text-2xl font-serif text-natural-dark font-bold">
+                            Taller de Integración y Juegos de Clase II
+                          </h3>
+                        </div>
+                        <span className="text-[10px] px-2.5 py-0.5 bg-[#5ba27f]/10 text-natural-primary rounded-md uppercase tracking-wider font-mono font-semibold">
+                          Validación Lúdica
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-natural-text-muted leading-relaxed print:hidden">
+                        La mejor forma de fijar la sabiduría profunda de Oriente no es mediante la repetición rígida, sino a través del juego reflexivo. Te invitamos a jugar el <strong>Desafío de Correspondencias de Símbolos</strong> y luego el <strong>Test Evaluativo de Trivia</strong> para reclamar tu diploma de Clase II.
+                      </p>
+
+                      {/* Matching Game Card */}
+                      <div className="bg-gradient-to-br from-natural-eggshell to-natural-cream/50 p-6 rounded-3xl border border-natural-border shadow-3xs space-y-6">
+                        <div className="border-b pb-3 border-natural-border/70 flex justify-between items-center">
+                          <h4 className="font-serif text-sm font-bold text-natural-primary flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-natural-secondary" />
+                            Juego 1: Desafío de Correspondencia de Símbolos
+                          </h4>
+                          {matchingChecked && (
+                            <span className="text-xs font-mono font-bold bg-white text-natural-primary px-3 py-1 rounded-full border border-natural-primary/30">
+                              Resultado: {matchingScore} / 9 aciertos
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="text-xs text-natural-text-muted leading-relaxed">
+                          Asocia cada símbolo de Reiki con su <strong>Deidad de Kurama</strong>, su <strong>Plano Celestial (Tierra / Luna / Sol)</strong> y su <strong>Arquetipo Universal</strong> según el texto estudiado:
+                        </p>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+                          {[
+                            { id: "cho-ku-rei", name: "Cho Ku Rei (超空靈)", correctDeity: "Goho Mao Son", correctPlane: "Tierra", correctArchetype: "El Guerrero Luminoso", color: "border-amber-300 bg-amber-50/20" },
+                            { id: "sei-he-ki", name: "Sei He Ki (聖平己)", correctDeity: "Senju Kannon", correctPlane: "Luna", correctArchetype: "La Madre Universal", color: "border-teal-300 bg-teal-50/20" },
+                            { id: "hon-sha-ze-sho-nen", name: "Hon Sha Ze Shō Nen (本者是正念)", correctDeity: "Bishamonten", correctPlane: "Sol", correctArchetype: "El Guardián", color: "border-red-300 bg-red-50/20" }
+                          ].map((sym) => {
+                            const dValue = selectedDeityGuess[sym.id] || "";
+                            const pValue = selectedPlaneGuess[sym.id] || "";
+                            const aValue = selectedArchetypeGuess[sym.id] || "";
+
+                            const dCorrect = dValue === sym.correctDeity;
+                            const pCorrect = pValue === sym.correctPlane;
+                            const aCorrect = aValue === sym.correctArchetype;
+
+                            return (
+                              <div key={sym.id} className={`p-4 rounded-2xl border bg-white ${sym.color} space-y-4 shadow-3xs`}>
+                                <h5 className="font-serif text-xs font-bold text-natural-dark border-b pb-2">{sym.name}</h5>
+                                
+                                {/* Deity Select */}
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-mono text-natural-text-muted uppercase tracking-wider block">Deidad Asociada:</label>
+                                  <div className="relative">
+                                    <select
+                                      disabled={matchingChecked}
+                                      value={dValue}
+                                      onChange={(e) => setSelectedDeityGuess(prev => ({ ...prev, [sym.id]: e.target.value }))}
+                                      className={`w-full text-xs p-2 rounded-xl bg-natural-bg border text-natural-dark focus:outline-none focus:border-natural-primary/50 ${
+                                        matchingChecked ? (dCorrect ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50") : "border-natural-border"
+                                      }`}
+                                    >
+                                      <option value="">-- Elegir Deidad --</option>
+                                      <option value="Goho Mao Son">Goho Mao Son (Voluntad/Fuerza)</option>
+                                      <option value="Senju Kannon">Senju Kannon (Compasión/Amor)</option>
+                                      <option value="Bishamonten">Bishamonten (Sabiduría/Orden)</option>
+                                    </select>
+                                    {matchingChecked && (
+                                      <span className="absolute right-2 top-2">{dCorrect ? "✅" : "❌"}</span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Plane Select */}
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-mono text-natural-text-muted uppercase tracking-wider block">Plano Celeste:</label>
+                                  <div className="relative">
+                                    <select
+                                      disabled={matchingChecked}
+                                      value={pValue}
+                                      onChange={(e) => setSelectedPlaneGuess(prev => ({ ...prev, [sym.id]: e.target.value }))}
+                                      className={`w-full text-xs p-2 rounded-xl bg-natural-bg border text-natural-dark focus:outline-none focus:border-natural-primary/50 ${
+                                        matchingChecked ? (pCorrect ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50") : "border-natural-border"
+                                      }`}
+                                    >
+                                      <option value="">-- Elegir Plano --</option>
+                                      <option value="Tierra">Tierra / Acción (Jing)</option>
+                                      <option value="Luna">Luna / Emoción (Qi)</option>
+                                      <option value="Sol">Sol / Conciencia (Shen)</option>
+                                    </select>
+                                    {matchingChecked && (
+                                      <span className="absolute right-2 top-2">{pCorrect ? "✅" : "❌"}</span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Archetype Select */}
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-mono text-natural-text-muted uppercase tracking-wider block">Arquetipo Universal:</label>
+                                  <div className="relative">
+                                    <select
+                                      disabled={matchingChecked}
+                                      value={aValue}
+                                      onChange={(e) => setSelectedArchetypeGuess(prev => ({ ...prev, [sym.id]: e.target.value }))}
+                                      className={`w-full text-xs p-2 rounded-xl bg-natural-bg border text-natural-dark focus:outline-none focus:border-natural-primary/50 ${
+                                        matchingChecked ? (aCorrect ? "border-green-400 bg-green-50" : "border-red-400 bg-red-50") : "border-natural-border"
+                                      }`}
+                                    >
+                                      <option value="">-- Elegir Arquetipo --</option>
+                                      <option value="El Guerrero Luminoso">El Guerrero Luminoso</option>
+                                      <option value="La Madre Universal">La Madre Universal</option>
+                                      <option value="El Guardián">El Guardián / Rey Justo</option>
+                                    </select>
+                                    {matchingChecked && (
+                                      <span className="absolute right-2 top-2">{aCorrect ? "✅" : "❌"}</span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Matching Controls */}
+                        <div className="flex justify-end gap-3 border-t border-natural-border/60 pt-4">
+                          {matchingChecked ? (
+                            <button
+                              onClick={() => {
+                                setSelectedDeityGuess({ "cho-ku-rei": "", "sei-he-ki": "", "hon-sha-ze-sho-nen": "" });
+                                setSelectedPlaneGuess({ "cho-ku-rei": "", "sei-he-ki": "", "hon-sha-ze-sho-nen": "" });
+                                setSelectedArchetypeGuess({ "cho-ku-rei": "", "sei-he-ki": "", "hon-sha-ze-sho-nen": "" });
+                                setMatchingChecked(false);
+                                setMatchingScore(0);
+                              }}
+                              className="inline-flex items-center gap-1.5 px-4 py-2 bg-natural-cream hover:bg-natural-sand rounded-xl text-xs font-semibold text-natural-dark transition shadow-2xs"
+                            >
+                              <RotateCw className="w-3.5 h-3.5" />
+                              <span>Reintentar Desafío</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                let score = 0;
+                                if (selectedDeityGuess["cho-ku-rei"] === "Goho Mao Son") score++;
+                                if (selectedPlaneGuess["cho-ku-rei"] === "Tierra") score++;
+                                if (selectedArchetypeGuess["cho-ku-rei"] === "El Guerrero Luminoso") score++;
+                                
+                                if (selectedDeityGuess["sei-he-ki"] === "Senju Kannon") score++;
+                                if (selectedPlaneGuess["sei-he-ki"] === "Luna") score++;
+                                if (selectedArchetypeGuess["sei-he-ki"] === "La Madre Universal") score++;
+                                
+                                if (selectedDeityGuess["hon-sha-ze-sho-nen"] === "Bishamonten") score++;
+                                if (selectedPlaneGuess["hon-sha-ze-sho-nen"] === "Sol") score++;
+                                if (selectedArchetypeGuess["hon-sha-ze-sho-nen"] === "El Guardián") score++;
+                                
+                                setMatchingScore(score);
+                                setMatchingChecked(true);
+                              }}
+                              className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-natural-primary text-white rounded-xl text-xs font-semibold hover:bg-natural-primary/95 transition-colors shadow-sm"
+                            >
+                              <span>Validar Emparejamientos</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Trivia Game Card */}
+                      <div className="bg-white p-6 rounded-3xl border border-natural-border shadow-3xs space-y-6">
+                        <div className="border-b pb-3 border-natural-border/70">
+                          <h4 className="font-serif text-sm font-bold text-natural-dark flex items-center gap-2">
+                            <Award className="w-4 h-4 text-natural-primary" />
+                            Juego 2: Test Evaluativo del Camino Interior (Clase II)
+                          </h4>
+                        </div>
+
+                        {c2ShowResults ? (
+                          /* TRIVIA RESULTS */
+                          <div className="space-y-6 animate-fade-in">
+                            {(() => {
+                              let score = 0;
+                              CLASS2_TRIVIA_QUESTIONS.forEach((q) => {
+                                if (c2QuizAnswers[q.id] === q.correctIndex) score++;
+                              });
+                              const passed = score >= 4;
+
+                              return (
+                                <div className="space-y-6">
+                                  <div className="p-6 rounded-3xl border text-center space-y-3 bg-natural-eggshell/60 border-natural-border">
+                                    <p className="text-xs uppercase tracking-widest font-mono font-bold text-natural-primary">TU RESULTADO DE TRIVIA</p>
+                                    <div className="text-4xl font-serif font-extrabold text-natural-dark">
+                                      {score} de 5 correctas
+                                    </div>
+                                    <p className="text-xs text-natural-text-muted leading-relaxed max-w-md mx-auto">
+                                      {passed 
+                                        ? "¡Excelente nivel de maestría e integración del Camino Interior! Has asimilado con devoción las uniones de las tradiciones de Oriente."
+                                        : "Has respondido bien algunas preguntas, pero para sintonizar el diploma necesitas al menos 4 respuestas correctas (80%). Relee el material y vuelve a intentar."}
+                                    </p>
+                                  </div>
+
+                                  {/* Questions details */}
+                                  <div className="space-y-4">
+                                    {CLASS2_TRIVIA_QUESTIONS.map((q) => {
+                                      const ansIdx = c2QuizAnswers[q.id];
+                                      const isCorrect = ansIdx === q.correctIndex;
+                                      return (
+                                        <div key={q.id} className={`p-4 rounded-2xl border text-xs leading-relaxed space-y-2 ${isCorrect ? "bg-green-50/40 border-green-200" : "bg-red-50/40 border-red-200"}`}>
+                                          <div className="flex items-start gap-2">
+                                            <span className="text-base">{isCorrect ? "✅" : "❌"}</span>
+                                            <div>
+                                              <p className="font-bold text-natural-dark">{q.question}</p>
+                                              <p className="text-natural-text-muted mt-1">Tu respuesta: <strong className="text-natural-dark">{q.options[ansIdx] || "Ninguna"}</strong></p>
+                                              {!isCorrect && (
+                                                <p className="text-natural-text-muted">Respuesta correcta: <strong className="text-green-700">{q.options[q.correctIndex]}</strong></p>
+                                              )}
+                                              <p className="text-[11px] text-natural-primary italic mt-2">💡 Explicación: {q.explanation}</p>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+
+                                  {/* Diploma input if passed */}
+                                  {passed && (
+                                    <div className="bg-gradient-to-br from-natural-cream/70 to-natural-sand/50 p-6 rounded-3xl border border-natural-border text-center space-y-4">
+                                      <DiplomaIcon className="w-10 h-10 text-natural-primary mx-auto animate-bounce" />
+                                      <h5 className="font-serif text-sm font-bold text-natural-dark">¡Felicidades! Habilitaste tu Diploma de Clase II</h5>
+                                      <p className="text-xs text-natural-text-muted max-w-md mx-auto">
+                                        Escribe tu nombre completo para emitir e imprimir tu Diploma Honorífico de sintonía en el Camino Interior de Reiki:
+                                      </p>
+                                      
+                                      <div className="max-w-xs mx-auto flex gap-2">
+                                        <input
+                                          type="text"
+                                          placeholder="Tu Nombre Completo"
+                                          value={c2DiplomaName}
+                                          onChange={(e) => setC2DiplomaName(e.target.value)}
+                                          className="flex-1 p-2.5 rounded-xl border border-natural-border text-xs bg-white text-natural-dark focus:outline-none focus:border-natural-primary"
+                                        />
+                                        <button
+                                          onClick={() => {
+                                            setC2ViewingDiploma(true);
+                                          }}
+                                          className="px-4 py-2.5 bg-natural-primary text-white rounded-xl text-xs font-bold hover:bg-natural-primary/95 transition-colors"
+                                        >
+                                          Ver Diploma
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Trivia Controls */}
+                                  <div className="flex justify-start border-t border-natural-border/60 pt-4">
+                                    <button
+                                      onClick={() => {
+                                        setC2QuizAnswers({});
+                                        setC2AnswersSubmitted(false);
+                                        setC2ShowResults(false);
+                                      }}
+                                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-natural-cream hover:bg-natural-sand rounded-xl text-xs font-semibold text-natural-dark transition shadow-2xs"
+                                    >
+                                      <RotateCw className="w-3.5 h-3.5" />
+                                      <span>Volver a Intentar Trivia</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        ) : (
+                          /* TRIVIA QUESTIONS IN PROGRESS */
+                          <div className="space-y-6">
+                            <p className="text-xs text-natural-text-muted leading-relaxed">
+                              Responde las siguientes 5 preguntas de selección múltiple sobre la alquimia interna y simbología de Clase II:
+                            </p>
+
+                            <div className="space-y-6">
+                              {CLASS2_TRIVIA_QUESTIONS.map((q, qIdx) => (
+                                <div key={q.id} className="space-y-2.5">
+                                  <div className="flex items-start gap-2">
+                                    <span className="w-5 h-5 rounded-full bg-natural-cream text-natural-primary text-[10px] font-mono font-bold flex items-center justify-center shrink-0 mt-0.5">
+                                      {qIdx + 1}
+                                    </span>
+                                    <h5 className="text-xs font-bold text-natural-dark leading-snug">{q.question}</h5>
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-7">
+                                    {q.options.map((option, oIdx) => {
+                                      const isSelected = c2QuizAnswers[q.id] === oIdx;
+                                      return (
+                                        <button
+                                          key={oIdx}
+                                          onClick={() => {
+                                            setC2QuizAnswers(prev => ({ ...prev, [q.id]: oIdx }));
+                                          }}
+                                          className={`w-full text-left p-3 rounded-xl border text-xs leading-normal transition-all ${
+                                            isSelected
+                                              ? "bg-natural-secondary/15 text-natural-primary border-natural-primary font-medium"
+                                              : "bg-natural-bg/50 border-natural-border hover:bg-natural-cream hover:border-natural-primary/30 text-natural-dark/90"
+                                          }`}
+                                        >
+                                          {option}
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Submit Trivia Container */}
+                            <div className="flex justify-end border-t border-natural-border/60 pt-4">
+                              <button
+                                disabled={CLASS2_TRIVIA_QUESTIONS.some((q) => c2QuizAnswers[q.id] === undefined)}
+                                onClick={() => {
+                                  setC2AnswersSubmitted(true);
+                                  setC2ShowResults(true);
+                                }}
+                                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-natural-primary text-white rounded-xl text-xs font-semibold hover:bg-natural-primary/95 transition-colors shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                <span>Enviar Respuestas de Trivia</span>
+                                <ChevronRight className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex justify-start items-center pt-4 border-t border-natural-border">
+                        <button
+                          onClick={() => {
+                            setActiveTab("c2_videos");
+                            markAsRead("c2_videos");
+                          }}
+                          className="inline-flex items-center space-x-1 px-4 py-2 bg-natural-cream hover:bg-natural-sand rounded-xl text-xs font-semibold text-natural-dark transition shadow-2xs"
+                        >
+                          <ChevronLeft className="w-3.5 h-3.5" />
+                          <span>Volver</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
             </motion.div>
           </AnimatePresence>
         </section>
@@ -1755,3 +3005,4 @@ export default function App() {
     </div>
   );
 }
+
