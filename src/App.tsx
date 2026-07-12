@@ -66,9 +66,9 @@ import {
   CLASS2_TRIVIA_QUESTIONS
 } from "./data/class2Content";
 
-import choKuReiImg from "./assets/images/cho_ku_rei_gold_1783785540494.jpg";
-import seiHeKiImg from "./assets/images/sei_he_ki_gold_1783785549476.jpg";
-import honShaZeShoNenImg from "./assets/images/hon_sha_ze_sho_nen_gold_1783785558640.jpg";
+import choKuReiImg from "./assets/images/cho_ku_rei_1783782332885.jpg";
+import seiHeKiImg from "./assets/images/sei_he_ki_1783782344312.jpg";
+import honShaZeShoNenImg from "./assets/images/hon_sha_ze_sho_nen_1783782356618.jpg";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>("bienvenida");
@@ -2142,7 +2142,7 @@ export default function App() {
                         plane: "Tierra",
                         archetype: "El Guerrero Luminoso / El Constructor",
                         imageSrc: choKuReiImg,
-                        color: "border-[#D4AF37]/30 bg-[#FFFDF5]"
+                        color: "border-[#C29B38]/30 bg-amber-50/10"
                       },
                       {
                         id: "sei-he-ki",
@@ -2158,7 +2158,7 @@ export default function App() {
                         plane: "Luna",
                         archetype: "La Madre Universal / La Compasión",
                         imageSrc: seiHeKiImg,
-                        color: "border-[#D4AF37]/30 bg-[#FFFDF5]"
+                        color: "border-[#5B9DA2]/30 bg-teal-50/10"
                       },
                       {
                         id: "hon-sha-ze-sho-nen",
@@ -2174,7 +2174,7 @@ export default function App() {
                         plane: "Sol",
                         archetype: "El Guardián / El Rey Justo",
                         imageSrc: honShaZeShoNenImg,
-                        color: "border-[#D4AF37]/30 bg-[#FFFDF5]"
+                        color: "border-[#C2735B]/30 bg-red-50/10"
                       }
                     ].map((symbol, idx) => (
                       <div 
