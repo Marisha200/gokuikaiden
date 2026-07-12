@@ -66,9 +66,9 @@ import {
   CLASS2_TRIVIA_QUESTIONS
 } from "./data/class2Content";
 
-import choKuReiImg from "./assets/images/cho_ku_rei_1783782332885.jpg";
-import seiHeKiImg from "./assets/images/sei_he_ki_1783782344312.jpg";
-import honShaZeShoNenImg from "./assets/images/hon_sha_ze_sho_nen_1783782356618.jpg";
+import choKuReiImg from "./assets/images/CKR.png";
+import seiHeKiImg from "./assets/images/SHK.png";
+import honShaZeShoNenImg from "./assets/images/HSZSN.png";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>("bienvenida");
