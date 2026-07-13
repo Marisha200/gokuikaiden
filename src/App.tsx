@@ -2250,6 +2250,43 @@ export default function App() {
                           ))}
                         </div>
                       </div>
+
+                      {/* Notas del Blog */}
+                      <div className="bg-gradient-to-b from-natural-cream/80 to-natural-sand/50 p-5 rounded-3xl border border-natural-border shadow-3xs space-y-3">
+                        <h4 className="font-serif text-xs font-bold text-natural-dark uppercase tracking-widest border-b pb-2 border-natural-border/60 flex items-center gap-1.5">
+                          <BookOpen className="w-4 h-4 text-natural-primary" />
+                          Notas del Blog
+                        </h4>
+                        
+                        <p className="text-[11px] text-natural-text-muted leading-relaxed">
+                          Artículos recomendados de Rincón Zen para ampliar tu comprensión y profundizar en temas esenciales:
+                        </p>
+
+                        <div className="space-y-3 pt-1">
+                          <div className="bg-white p-3 rounded-2xl border border-natural-border/60 hover:border-natural-primary/55 transition-all shadow-3xs group flex flex-col justify-between">
+                            <div>
+                              <span className="text-[11px] font-bold text-[#3D301E] block group-hover:text-natural-primary transition-colors leading-normal">
+                                ¿Qué es un Egregor? La energía invisible que también nos habita
+                              </span>
+                              <p className="text-[10px] text-natural-text-muted/90 mt-1 leading-normal">
+                                Descubrí cómo los pensamientos y emociones colectivas crean corrientes energéticas y cómo influyen en nuestra vibración cotidiana.
+                              </p>
+                            </div>
+                            
+                            <div className="mt-3 flex justify-end">
+                              <a
+                                href="https://www.rinconzen.com.ar/post/qu%C3%A9-es-un-egregor-la-energ%C3%ADa-invisible-que-tambi%C3%A9n-nos-habita"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-natural-sand hover:bg-natural-primary/10 rounded-lg text-[10px] uppercase tracking-wider font-bold text-natural-primary transition-colors focus:outline-none border border-natural-border/40 hover:border-natural-primary/30"
+                              >
+                                <BookOpen className="w-3.5 h-3.5" />
+                                <span>Leer Artículo</span>
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -3014,7 +3051,7 @@ export default function App() {
                             <p className="text-[11px] text-natural-text-muted leading-relaxed">
                               Puedes hacer clic para descargar o abrir el material de estudio directo desde Google Drive:
                             </p>
-
+ 
                             <div className="space-y-3 pt-1">
                               {downloadableDocs2.map((doc) => (
                                 <div 
@@ -3052,6 +3089,43 @@ export default function App() {
                             </p>
                           </div>
                         )}
+                      </div>
+
+                      {/* Notas del Blog */}
+                      <div className="bg-gradient-to-b from-natural-cream/80 to-natural-sand/50 p-5 rounded-3xl border border-natural-border shadow-3xs space-y-3">
+                        <h4 className="font-serif text-xs font-bold text-natural-dark uppercase tracking-widest border-b pb-2 border-natural-border/60 flex items-center gap-1.5">
+                          <BookOpen className="w-4 h-4 text-natural-primary" />
+                          Notas del Blog
+                        </h4>
+                        
+                        <p className="text-[11px] text-natural-text-muted leading-relaxed">
+                          Artículos recomendados de Rincón Zen para ampliar tu comprensión y profundizar en temas esenciales:
+                        </p>
+
+                        <div className="space-y-3 pt-1">
+                          <div className="bg-white p-3 rounded-2xl border border-natural-border/60 hover:border-natural-primary/55 transition-all shadow-3xs group flex flex-col justify-between">
+                            <div>
+                              <span className="text-[11px] font-bold text-[#3D301E] block group-hover:text-natural-primary transition-colors leading-normal">
+                                ¿Qué es un Egregor? La energía invisible que también nos habita
+                              </span>
+                              <p className="text-[10px] text-natural-text-muted/90 mt-1 leading-normal">
+                                Descubrí cómo los pensamientos y emociones colectivas crean corrientes energéticas y cómo influyen en nuestra vibración cotidiana.
+                              </p>
+                            </div>
+                            
+                            <div className="mt-3 flex justify-end">
+                              <a
+                                href="https://www.rinconzen.com.ar/post/qu%C3%A9-es-un-egregor-la-energ%C3%ADa-invisible-que-tambi%C3%A9n-nos-habita"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-natural-sand hover:bg-natural-primary/10 rounded-lg text-[10px] uppercase tracking-wider font-bold text-natural-primary transition-colors focus:outline-none border border-natural-border/40 hover:border-natural-primary/30"
+                              >
+                                <BookOpen className="w-3.5 h-3.5" />
+                                <span>Leer Artículo</span>
+                              </a>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
