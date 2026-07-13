@@ -75,9 +75,9 @@ import {
   CLASS2_TRIVIA_QUESTIONS
 } from "./data/class2Content";
 
-import choKuReiImg from "./assets/images/cho_ku_rei_stone_gold.jpg";
-import seiHeKiImg from "./assets/images/sei_he_ki_stone_gold.jpg";
-import honShaZeShoNenImg from "./assets/images/hon_sha_ze_sho_nen_stone_gold.jpg";
+import choKuReiImg from "./assets/images/CKR.png";
+import seiHeKiImg from "./assets/images/SHK.png";
+import honShaZeShoNenImg from "./assets/images/HSZSN.png";
 import toriiGateImg from "./assets/images/torii_gate.jpg";
 
 export default function App() {
