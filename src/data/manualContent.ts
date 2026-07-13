@@ -35,7 +35,7 @@ export interface RoadmapStep {
 }
 
 export const GREETING_TEXT = {
-  title: "¡Bienvenidos/as a la Maestría de Reiki!",
+  title: "Ser canal, ser presencia: el inicio del camino",
   author: "Marina",
   school: "Rincón Zen",
   intro: `Hoy comienza un capítulo trascendental en su camino como reikistas. Al embarcarse en este nivel de maestría, no solo asumieron un nuevo compromiso con ustedes mismos, sino también con todos los demás y de todos los reinos. Este es un paso que no se mide en títulos ni en símbolos, sino en profundidad, consciencia y apertura del corazón.`,

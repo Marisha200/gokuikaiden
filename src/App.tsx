@@ -41,7 +41,16 @@ import {
   Play,
   Plus,
   Trash2,
-  FileText
+  FileText,
+  Music,
+  Waves,
+  ClipboardList,
+  Home,
+  Network,
+  Send,
+  Users,
+  Grid,
+  GraduationCap
 } from "lucide-react";
 
 import {
@@ -66,12 +75,13 @@ import {
   CLASS2_TRIVIA_QUESTIONS
 } from "./data/class2Content";
 
-import choKuReiImg from "./assets/images/CKR.png";
-import seiHeKiImg from "./assets/images/SHK.png";
-import honShaZeShoNenImg from "./assets/images/HSZSN.png";
+import choKuReiImg from "./assets/images/cho_ku_rei_stone_gold.jpg";
+import seiHeKiImg from "./assets/images/sei_he_ki_stone_gold.jpg";
+import honShaZeShoNenImg from "./assets/images/hon_sha_ze_sho_nen_stone_gold.jpg";
+import toriiGateImg from "./assets/images/torii_gate.jpg";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>("bienvenida");
+  const [activeTab, setActiveTab] = useState<string>("landing_bienvenida");
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [kanjiSubTab, setKanjiSubTab] = useState<string>("origen");
 
@@ -137,31 +147,68 @@ export default function App() {
   const [customVideos2] = useState<{ id: string; title: string; description: string; url: string; type?: "youtube" | "vimeo" | "youtube_playlist" }[]>(() => {
     return [
       {
-        id: "PL0g9expKbVYIsIq5LNskW-C44imC4sdvS",
+        id: "PLzBwNj_gSsync8ZABWy4JR-wRIbMem7uq",
         type: "youtube_playlist",
-        title: "Símbolos y Prácticas de Nivel II (Okuden)",
-        description: "Lista de reproducción sugerida para acompañar el trazado de símbolos de Nivel II y las meditaciones energéticas.",
-        url: "https://www.youtube.com/watch?v=8F1tIfEnh-8&list=PL0g9expKbVYIsIq5LNskW-C44imC4sdvS&index=1"
+        title: "Introducción al Tao",
+        description: "Lista de reproducción de Introducción al Tao para complementar las bases filosóficas y espirituales del Nivel II.",
+        url: "https://www.youtube.com/watch?v=ao-drCtJUeo&list=PLzBwNj_gSsync8ZABWy4JR-wRIbMem7uq"
+      },
+      {
+        id: "XMf3bciOKn4",
+        type: "youtube",
+        title: "Órbita Microcósmica",
+        description: "Práctica y meditación guiada de la circulación de energía en la Órbita Microcósmica.",
+        url: "https://www.youtube.com/watch?v=XMf3bciOKn4"
       }
     ];
   });
 
   // Documentos y Manuales PDF para la Clase II
   const [downloadableDocs2] = useState<{ id: string; title: string; description: string; url: string }[]>(() => {
-    return [
-      {
-        id: "manual-reiki-nivel-2-okuden",
-        title: "Manual de Reiki Nivel II - El Camino Interior",
-        description: "Material oficial para profundizar en los Tres Tesoros, los Dantians, la Órbita Microcósmica y los Símbolos Sagrados.",
-        url: "https://drive.google.com/file/d/1ofv5hI9S7fvRXsya0yDgF3k_UgF51fQd/view?usp=sharing"
-      }
-    ];
+    return [];
   });
 
-  const [selectedVideoId2, setSelectedVideoId2] = useState<string>("PL0g9expKbVYIsIq5LNskW-C44imC4sdvS");
+  const [selectedVideoId2, setSelectedVideoId2] = useState<string>("PLzBwNj_gSsync8ZABWy4JR-wRIbMem7uq");
 
   // Class Selection States
-  const [selectedClass, setSelectedClass] = useState<number>(1);
+  const [selectedClass, setSelectedClass] = useState<number>(0);
+
+  // Web Audio Meditation States (Class 3)
+  const [isPlayingSound, setIsPlayingSound] = useState<boolean>(false);
+  const [selectedFrequency, setSelectedFrequency] = useState<number>(432);
+  const [soundVolume, setSoundVolume] = useState<number>(0.3);
+  const audioCtxRef = React.useRef<AudioContext | null>(null);
+  const oscillatorRef = React.useRef<OscillatorNode | null>(null);
+  const gainNodeRef = React.useRef<GainNode | null>(null);
+
+  // Reiju Attunement Checklist States (Class 4)
+  const [reijuSteps, setReijuSteps] = useState<Record<number, boolean>>({
+    1: false,
+    2: false,
+    3: false,
+    4: false,
+    5: false,
+    6: false
+  });
+
+  // Crystal Mandala Distance Healing States (Class 6)
+  const [placedCrystals, setPlacedCrystals] = useState<Record<string, string>>({
+    center: "Cuarzo Hialino",
+    north: "Amatista",
+    south: "Cuarzo Rosa",
+    east: "Selenita",
+    west: "Fluorita",
+    northeast: "Turmalina Negra",
+    northwest: "Citrino",
+    southeast: "Ágata",
+    southwest: "Jaspe Rojo"
+  });
+  const [mandalaActive, setMandalaActive] = useState<boolean>(false);
+  const [mandalaIntent, setMandalaIntent] = useState<string>("");
+
+  // Shihan Graduation States (Class 7)
+  const [c7DiplomaName, setC7DiplomaName] = useState<string>("");
+  const [c7ViewingDiploma, setC7ViewingDiploma] = useState<boolean>(false);
 
   // Class 2 Quiz States
   const [c2QuizAnswers, setC2QuizAnswers] = useState<Record<number, number>>({});
@@ -216,6 +263,98 @@ export default function App() {
   const markAsRead = (tab: string) => {
     setReadSections((prev) => ({ ...prev, [tab]: true }));
   };
+
+  const startMeditationSound = () => {
+    try {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = audioCtxRef.current;
+      
+      if (oscillatorRef.current) {
+        try {
+          oscillatorRef.current.stop();
+          oscillatorRef.current.disconnect();
+        } catch {}
+      }
+      
+      const osc = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(selectedFrequency, ctx.currentTime);
+      
+      gainNode.gain.setValueAtTime(0, ctx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(soundVolume, ctx.currentTime + 1.5);
+      
+      osc.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      osc.start();
+      
+      oscillatorRef.current = osc;
+      gainNodeRef.current = gainNode;
+      setIsPlayingSound(true);
+    } catch (err) {
+      console.error("Audio Context failed", err);
+    }
+  };
+
+  const stopMeditationSound = () => {
+    if (oscillatorRef.current && audioCtxRef.current) {
+      const ctx = audioCtxRef.current;
+      if (gainNodeRef.current) {
+        try {
+          gainNodeRef.current.gain.setValueAtTime(gainNodeRef.current.gain.value, ctx.currentTime);
+          gainNodeRef.current.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.0);
+        } catch {}
+        setTimeout(() => {
+          try {
+            if (oscillatorRef.current) {
+              oscillatorRef.current.stop();
+              oscillatorRef.current.disconnect();
+              oscillatorRef.current = null;
+            }
+            setIsPlayingSound(false);
+          } catch {}
+        }, 1000);
+      } else {
+        try {
+          oscillatorRef.current.stop();
+          oscillatorRef.current.disconnect();
+        } catch {}
+        oscillatorRef.current = null;
+        setIsPlayingSound(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (oscillatorRef.current && audioCtxRef.current) {
+      try {
+        oscillatorRef.current.frequency.setValueAtTime(selectedFrequency, audioCtxRef.current.currentTime);
+      } catch {}
+    }
+  }, [selectedFrequency]);
+
+  useEffect(() => {
+    if (gainNodeRef.current && audioCtxRef.current) {
+      try {
+        gainNodeRef.current.gain.setValueAtTime(soundVolume, audioCtxRef.current.currentTime);
+      } catch {}
+    }
+  }, [soundVolume]);
+
+  useEffect(() => {
+    return () => {
+      if (oscillatorRef.current) {
+        try {
+          oscillatorRef.current.stop();
+          oscillatorRef.current.disconnect();
+        } catch {}
+      }
+    };
+  }, [activeTab]);
 
   const handleSelectOption = (questionId: number, optionIndex: number) => {
     if (answersSubmitted) return;
@@ -278,16 +417,81 @@ export default function App() {
     { id: "c2_juegos", label: "Juegos Evaluativos", icon: Award }
   ];
 
-  const menuItems = selectedClass === 1 ? menuItems1 : menuItems2;
+  const menuItems3 = [
+    { id: "c3_bienvenida", label: "Inicio", icon: Flower2 },
+    { id: "c3_kotodamas", label: "Los Kotodamas", icon: Music },
+    { id: "c3_vibracion", label: "Vibración Sagrada", icon: Sparkles },
+    { id: "c3_meditacion", label: "Baño de Sonido", icon: Waves }
+  ];
+
+  const menuItems4 = [
+    { id: "c4_bienvenida", label: "Inicio", icon: Flower2 },
+    { id: "c4_reiju", label: "Significado Reiju", icon: Heart },
+    { id: "c4_protocolo", label: "Ceremonia Reiju", icon: ClipboardList },
+    { id: "c4_espacio", label: "Espacio Sagrado", icon: Home }
+  ];
+
+  const menuItems5 = [
+    { id: "c5_bienvenida", label: "Inicio", icon: Flower2 },
+    { id: "c5_linaje", label: "Linaje Reiki", icon: Network },
+    { id: "c5_gakkai", label: "Usui Ryoho Gakkai", icon: BookOpen },
+    { id: "c5_historia", label: "Verdad Histórica", icon: BookOpen }
+  ];
+
+  const menuItems6 = [
+    { id: "c6_bienvenida", label: "Inicio", icon: Flower2 },
+    { id: "c6_enkaku", label: "Técnicas Distancia", icon: Send },
+    { id: "c6_ancestros", label: "Línea Ancestral", icon: Users },
+    { id: "c6_mandalas", label: "Rejilla de Cristales", icon: Grid }
+  ];
+
+  const menuItems7 = [
+    { id: "c7_bienvenida", label: "Inicio", icon: Flower2 },
+    { id: "c7_shihan", label: "El Rol del Shihan", icon: Award },
+    { id: "c7_ensenar", label: "Pedagogía Reiki", icon: GraduationCap },
+    { id: "c7_graduacion", label: "Grado de Maestro", icon: Award }
+  ];
+
+  const getMenuItems = () => {
+    switch (selectedClass) {
+      case 1: return menuItems1;
+      case 2: return menuItems2;
+      case 3: return menuItems3;
+      case 4: return menuItems4;
+      case 5: return menuItems5;
+      case 6: return menuItems6;
+      case 7: return menuItems7;
+      default: return [];
+    }
+  };
+
+  const menuItems = getMenuItems();
 
   const changeClass = (classNum: number) => {
     setSelectedClass(classNum);
-    if (classNum === 1) {
+    if (classNum === 0) {
+      setActiveTab("landing_bienvenida");
+    } else if (classNum === 1) {
       setActiveTab("bienvenida");
       markAsRead("bienvenida");
-    } else {
+    } else if (classNum === 2) {
       setActiveTab("c2_bienvenida");
       markAsRead("c2_bienvenida");
+    } else if (classNum === 3) {
+      setActiveTab("c3_bienvenida");
+      markAsRead("c3_bienvenida");
+    } else if (classNum === 4) {
+      setActiveTab("c4_bienvenida");
+      markAsRead("c4_bienvenida");
+    } else if (classNum === 5) {
+      setActiveTab("c5_bienvenida");
+      markAsRead("c5_bienvenida");
+    } else if (classNum === 6) {
+      setActiveTab("c6_bienvenida");
+      markAsRead("c6_bienvenida");
+    } else if (classNum === 7) {
+      setActiveTab("c7_bienvenida");
+      markAsRead("c7_bienvenida");
     }
   };
 
@@ -362,53 +566,71 @@ export default function App() {
             </div>
           </div>
 
-          {/* DESKTOP TABS BAR */}
-          <nav className="hidden xl:flex space-x-1 bg-natural-dark/20 p-1 rounded-full border border-natural-bg/15">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isRead = readSections[item.id];
+          {/* DESKTOP TABS BAR FOR CLASSES */}
+          <nav className="hidden md:flex space-x-1 bg-natural-dark/20 p-1 rounded-full border border-natural-bg/15 overflow-x-auto max-w-[65%] scrollbar-none">
+            <button
+              onClick={() => changeClass(0)}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 transition-all shrink-0 ${
+                selectedClass === 0
+                  ? "bg-natural-bg text-natural-primary shadow-xs"
+                  : "text-natural-bg/80 hover:text-natural-bg hover:bg-natural-secondary/20"
+              }`}
+            >
+              <Home className="w-3.5 h-3.5" />
+              <span>Inicio</span>
+            </button>
+            {[
+              { id: 1, label: "Clase I" },
+              { id: 2, label: "Clase II" },
+              { id: 3, label: "Clase III" },
+              { id: 4, label: "Clase IV" },
+              { id: 5, label: "Clase V" },
+              { id: 6, label: "Clase VI" },
+              { id: 7, label: "Clase VII" }
+            ].map((clase) => {
+              const isLocked = clase.id >= 3;
+              const isActive = selectedClass === clase.id;
+
+              if (isLocked) {
+                return (
+                  <div
+                    key={clase.id}
+                    className="px-3 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1 transition-all shrink-0 text-natural-bg/40 cursor-not-allowed select-none"
+                    title="Clase por definir"
+                  >
+                    <Lock className="w-3 h-3 opacity-60" />
+                    <span>{clase.label}</span>
+                  </div>
+                );
+              }
+
               return (
                 <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveTab(item.id);
-                    markAsRead(item.id);
-                  }}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center space-x-1.5 transition-all ${
-                    activeTab === item.id
-                      ? "bg-natural-secondary text-natural-bg shadow-md font-semibold"
+                  key={clase.id}
+                  onClick={() => changeClass(clase.id)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-1.5 transition-all shrink-0 ${
+                    isActive
+                      ? "bg-natural-bg text-natural-primary shadow-xs"
                       : "text-natural-bg/80 hover:text-natural-bg hover:bg-natural-secondary/20"
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5 text-natural-bg" />
-                  <span>{item.label}</span>
-                  {isRead && item.id !== activeTab && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-natural-bg inline-block animate-pulse" />
-                  )}
+                  <span>{clase.label}</span>
                 </button>
               );
             })}
           </nav>
 
-          {/* RIGHT UTILITY INFOBANNER */}
-          <div className="hidden lg:flex items-center space-x-2 text-natural-bg text-xs">
-            <span className="bg-natural-secondary px-4 py-2 rounded-full text-xs font-bold text-natural-bg flex items-center gap-1">
-              <Calendar className="w-3 h-3" />
-              Perfil del Maestro
-            </span>
-          </div>
-
           {/* MOBILE MENU BUTTON */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="xl:hidden p-2 rounded-lg bg-natural-bg/10 hover:bg-natural-bg/25 text-natural-bg transition-colors"
+            className="md:hidden p-2 rounded-lg bg-natural-bg/10 hover:bg-natural-bg/25 text-natural-bg transition-colors"
             id="mobile-menu-trigger"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </header>
- 
+
       {/* MOBILE MENU DRAWER */}
       <AnimatePresence>
         {mobileMenuOpen && (
@@ -417,29 +639,61 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.15 }}
-            className="xl:hidden bg-natural-bg border-b border-natural-border z-20 absolute w-full left-0 shadow-lg px-4 py-4 print:hidden"
+            className="md:hidden bg-natural-bg border-b border-natural-border z-25 absolute w-full left-0 shadow-lg px-4 py-4 print:hidden"
           >
             <div className="grid grid-cols-2 gap-2">
-              {menuItems.map((item) => {
-                const Icon = item.icon;
-                const isRead = readSections[item.id];
+              <button
+                onClick={() => {
+                  changeClass(0);
+                  setMobileMenuOpen(false);
+                }}
+                className={`p-3 rounded-lg text-left text-xs font-semibold flex items-center space-x-2.5 transition-all border ${
+                  selectedClass === 0
+                    ? "bg-natural-primary text-white border-natural-primary shadow-xs"
+                    : "bg-white text-natural-dark border-natural-border hover:bg-natural-sand"
+                }`}
+              >
+                <Home className="w-4 h-4 shrink-0" />
+                <span>Inicio / Bienvenida</span>
+              </button>
+              {[
+                { id: 1, label: "Clase I" },
+                { id: 2, label: "Clase II" },
+                { id: 3, label: "Clase III" },
+                { id: 4, label: "Clase IV" },
+                { id: 5, label: "Clase V" },
+                { id: 6, label: "Clase VI" },
+                { id: 7, label: "Clase VII" }
+              ].map((clase) => {
+                const isLocked = clase.id >= 3;
+                const isActive = selectedClass === clase.id;
+
+                if (isLocked) {
+                  return (
+                    <div
+                      key={clase.id}
+                      className="p-3 rounded-lg text-left text-xs font-semibold flex items-center space-x-2.5 transition-all border bg-gray-50/50 text-gray-400 border-gray-200 cursor-not-allowed select-none"
+                    >
+                      <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                      <span>{clase.label}</span>
+                    </div>
+                  );
+                }
+
                 return (
                   <button
-                    key={item.id}
+                    key={clase.id}
                     onClick={() => {
-                      setActiveTab(item.id);
-                      markAsRead(item.id);
+                      changeClass(clase.id);
                       setMobileMenuOpen(false);
                     }}
-                    className={`p-3 rounded-lg text-left text-xs font-medium flex items-center space-x-2.5 transition-all ${
-                      activeTab === item.id
-                        ? "bg-natural-secondary text-natural-bg font-bold"
-                        : "bg-white text-natural-dark hover:bg-natural-sand border border-natural-border"
+                    className={`p-3 rounded-lg text-left text-xs font-semibold flex items-center space-x-2.5 transition-all border ${
+                      isActive
+                        ? "bg-natural-primary text-white border-natural-primary shadow-xs"
+                        : "bg-white text-natural-dark border-natural-border hover:bg-natural-sand"
                     }`}
                   >
-                    <Icon className="w-4 h-4 text-natural-primary shrink-0" />
-                    <span className="truncate">{item.label}</span>
-                    {isRead && <span className="w-1.5 h-1.5 rounded-full bg-natural-primary block" />}
+                    <span>{clase.label}</span>
                   </button>
                 );
               })}
@@ -447,68 +701,320 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
- 
+
       {/* CORE BRANDING HERO BANNER AT TOP OF ALL TABS */}
-      <section className="bg-gradient-to-r from-natural-cream to-natural-sand py-8 px-4 sm:px-6 lg:px-8 border-b border-natural-border print:hidden animate-fade-in">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-block px-3 py-1 bg-white/80 rounded-full text-xs tracking-widest text-[#5ba27f] uppercase font-bold border border-natural-border shadow-xs mb-3">
-            <span className="text-natural-primary">Nivel de Maestría ● Reiki Tradicional Japonés</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-serif tracking-tight text-natural-dark font-semibold">
-            {selectedClass === 1 ? "Gokuikaiden" : "El Mapa del Camino Interior"}
-          </h2>
-          <p className="mt-2 text-natural-text-muted text-sm sm:text-base italic max-w-xl mx-auto leading-relaxed">
-            {selectedClass === 1 
-              ? "“La transmisión completa de los secretos esenciales. El camino para aprender, sanar y encender la chispa del Satori.”" 
-              : "“La integración del Taoísmo, Budismo, Shintō y Reiki Tradicional. La espiritualidad profunda como camino de transformación del ser.”"}
-          </p>
-        </div>
-      </section>
-
-      {/* HORIZONTAL CLASS SELECTOR MENU */}
-      <div className="bg-natural-eggshell border-b border-natural-border py-4 print:hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
-            <span className="text-[10px] font-bold text-natural-primary uppercase tracking-widest mr-1 font-serif">Clase Activa:</span>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => changeClass(1)}
-                className={`px-4 sm:px-5 py-2 rounded-2xl text-xs font-bold tracking-wide transition-all duration-300 flex items-center gap-2 border ${
-                  selectedClass === 1
-                    ? "bg-natural-primary text-white border-natural-primary shadow-xs scale-102"
-                    : "bg-white text-natural-dark hover:bg-natural-cream border-natural-border"
-                }`}
-              >
-                <Award className="w-3.5 h-3.5" />
-                <span>Clase I: Gokuikaiden</span>
-              </button>
-
-              <button
-                onClick={() => changeClass(2)}
-                className={`px-4 sm:px-5 py-2 rounded-2xl text-xs font-bold tracking-wide transition-all duration-300 flex items-center gap-2 border ${
-                  selectedClass === 2
-                    ? "bg-natural-primary text-white border-natural-primary shadow-xs scale-102"
-                    : "bg-white text-natural-dark hover:bg-natural-cream border-natural-border"
-                }`}
-              >
-                <Compass className="w-3.5 h-3.5" />
-                <span>Clase II: Camino Interior</span>
-              </button>
+      {selectedClass > 0 && (
+        <section className="bg-gradient-to-r from-natural-cream to-natural-sand py-8 px-4 sm:px-6 lg:px-8 border-b border-natural-border print:hidden animate-fade-in">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="inline-block px-3 py-1 bg-white/80 rounded-full text-xs tracking-widest text-[#5ba27f] uppercase font-bold border border-natural-border shadow-xs mb-3">
+              <span className="text-natural-primary">Nivel de Maestría ● Reiki Tradicional Japonés</span>
             </div>
+            <h2 className="text-3xl sm:text-4xl font-serif tracking-tight text-natural-dark font-semibold">
+              {selectedClass === 1 && "Clase I: Gokuikaiden (El Grado de Maestría)"}
+              {selectedClass === 2 && "Clase II: El Camino Interior (Okuden Profundo)"}
+              {selectedClass === 3 && "Clase III: Los Kotodamas Sagrados (Vibración)"}
+              {selectedClass === 4 && "Clase IV: Técnicas de Reiju (Iniciación)"}
+              {selectedClass === 5 && "Clase V: Linaje e Historia Tradicional"}
+              {selectedClass === 6 && "Clase VI: Sanación Distante y Ancestral"}
+              {selectedClass === 7 && "Clase VII: El Grado del Shihan (Maestro)"}
+            </h2>
+            <p className="mt-2 text-natural-text-muted text-sm sm:text-base italic max-w-xl mx-auto leading-relaxed">
+              {selectedClass === 1 && "“La transmisión completa de los secretos esenciales. El camino para aprender, sanar y encender la chispa del Satori.”"}
+              {selectedClass === 2 && "“La integración del Taoísmo, Budismo, Shintō y Reiki Tradicional. La espiritualidad profunda como camino de transformación del ser.”"}
+              {selectedClass === 3 && "“El poder de la voz sagrada y la resonancia acústica del alma. El canto que sintoniza cada célula con el Cosmos.”"}
+              {selectedClass === 4 && "“La ceremonia sagrada de la purificación continua y la transmisión sutil directa de Shihan a estudiante.”"}
+              {selectedClass === 5 && "“La verdad histórica documentada, los presidentes de la Gakkai original y la cadena dorada de nuestro linaje.”"}
+              {selectedClass === 6 && "“La sanación cuántica generacional de los ancestros y la activación continua de la Rejilla de Cristales sagrada.”"}
+              {selectedClass === 7 && "“El compromiso último con la pureza, la compasión, la ética de la enseñanza y el diploma oficial de graduación.”"}
+            </p>
           </div>
-        </div>
-      </div>
+        </section>
+      )}
 
       {/* MAIN LAYOUT */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col lg:flex-row gap-8">
-        
-        {/* SIDE BAR NAVIGATION (only visible on large screens) */}
-        <aside className="hidden lg:block w-64 shrink-0 print:hidden">
-          <div className="sticky top-24 space-y-6">
-            <div className="bg-white p-5 rounded-2xl border border-natural-border shadow-xs">
-              <h3 className="text-xs font-bold font-serif text-natural-primary tracking-wider mb-4 uppercase">
-                {selectedClass === 1 ? "Temas de Clase I" : "Temas de Clase II"}
-              </h3>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        {selectedClass === 0 ? (
+          /* PORTAL LANDING PAGE */
+          <div className="space-y-12 animate-fade-in">
+            {/* Welcome banner */}
+            <div className="bg-white p-6 sm:p-10 rounded-3xl border border-natural-border shadow-3xs flex flex-col md:flex-row items-center gap-8">
+              <div className="flex-1 space-y-4">
+                <div className="inline-block px-3 py-1 bg-natural-cream rounded-full text-xs font-bold tracking-widest text-natural-primary uppercase border border-natural-border/60">
+                  Rincón Zen ● Curso Oficial de Maestría
+                </div>
+                <h2 className="text-2xl sm:text-3.5xl font-serif text-natural-dark font-semibold leading-tight">
+                  Bienvenidos/as al Sendero de Gokuikaiden
+                </h2>
+                <div className="space-y-3.5 text-xs sm:text-sm text-natural-text-muted leading-relaxed">
+                  <p>
+                    Este material fue creado para acompañarte a lo largo de las 7 clases que integran este recorrido, combinando teoría, práctica, reflexión y experiencia personal.
+                  </p>
+                  <p>
+                    Acá vas a encontrar contenidos fundamentales, símbolos, meditaciones, prácticas guiadas, sintonizaciones y recursos interactivos pensados para profundizar tu comprensión de Reiki y fortalecer tu camino como practicante y futuro/a maestro/a.
+                  </p>
+                  <p>
+                    La propuesta no es solo incorporar información, sino aprender a transmitir Reiki con claridad, respeto y presencia, honrando sus raíces tradicionales y desarrollando una práctica consciente, simple y profunda.
+                  </p>
+                  <p>
+                    Bienvenido/a a esta etapa de integración, estudio y transformación.
+                  </p>
+                  <div className="flex justify-end pt-1">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-natural-primary/10 border border-natural-primary/25 rounded-full text-xs sm:text-sm font-serif font-bold text-natural-primary tracking-wide shadow-3xs hover:bg-natural-primary/15 transition-all">
+                      Marina 🌸
+                    </span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 bg-natural-sand/30 border border-natural-border/70 rounded-2xl text-xs text-natural-text-muted italic leading-relaxed flex items-center">
+                    <div>&ldquo;Sintonizar el canal energético es un acto de amor y respeto hacia ti mismo y hacia el linaje de Mikao Usui.&rdquo;</div>
+                  </div>
+                  <div className="p-4 bg-[#f8faf8] border border-natural-primary/20 rounded-2xl text-xs text-natural-text-muted italic leading-relaxed flex flex-col justify-between">
+                    <div>
+                      &ldquo;Si las puertas de la percepción se limpiaran, todo aparecería ante el ser tal como es: infinito.&rdquo;
+                    </div>
+                    <span className="text-[10px] text-natural-primary font-semibold text-right mt-1.5">— William Blake</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="w-full md:w-80 shrink-0 rounded-2xl overflow-hidden border border-natural-border/80 shadow-xs">
+                <img 
+                  src={toriiGateImg} 
+                  alt="Torii Gate Rincón Zen" 
+                  className="w-full h-56 object-cover hover:scale-105 transition-transform duration-500"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="bg-natural-sand/50 p-3 text-center border-t border-natural-border/60 text-[10px] font-mono tracking-wider text-natural-dark">
+                  ⛩️ Torii en el Monte Kurama
+                </div>
+              </div>
+            </div>
+
+            {/* Curriculum grid */}
+            <div className="space-y-6">
+              <div className="text-center md:text-left">
+                <h3 className="text-xl font-serif text-natural-dark font-bold">Plan de Estudio de la Maestría (7 Clases)</h3>
+                <p className="text-xs text-natural-text-muted mt-1">Selecciona la clase que deseas estudiar y practicar hoy:</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Card 1 */}
+                <button 
+                  onClick={() => changeClass(1)}
+                  className="text-left bg-white p-6 rounded-3xl border border-natural-border hover:border-natural-primary/50 hover:shadow-2xs transition-all duration-300 group flex flex-col justify-between h-64 cursor-pointer"
+                >
+                  <div>
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="p-3 rounded-2xl bg-natural-sand text-natural-primary group-hover:bg-natural-primary group-hover:text-white transition-all">
+                        <Flower2 className="w-6 h-6" />
+                      </div>
+                      <span className="text-[10px] uppercase font-mono font-bold tracking-widest px-2.5 py-1 bg-[#eef6f0] text-[#3e7256] rounded-full">
+                        Disponible
+                      </span>
+                    </div>
+                    <h4 className="font-serif text-base font-bold text-natural-dark group-hover:text-natural-primary transition-colors">
+                      Clase I: Gokuikaiden
+                    </h4>
+                    <p className="text-xs text-natural-text-muted mt-2 leading-relaxed line-clamp-3">
+                      Explora las uniones de la transmisión, el kanji Reiki descifrado, los gokais originales de Mikao Usui, Byosen y Hibiki, y el Test Evaluativo de Maestría.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-natural-primary pt-4 mt-auto border-t border-natural-border/40 w-full">
+                    <span>Ingresar a Clase I</span>
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </button>
+
+                {/* Card 2 */}
+                <button 
+                  onClick={() => changeClass(2)}
+                  className="text-left bg-white p-6 rounded-3xl border border-natural-border hover:border-natural-primary/50 hover:shadow-2xs transition-all duration-300 group flex flex-col justify-between h-64 cursor-pointer"
+                >
+                  <div>
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="p-3 rounded-2xl bg-natural-sand text-natural-primary group-hover:bg-natural-primary group-hover:text-white transition-all">
+                        <Compass className="w-6 h-6" />
+                      </div>
+                      <span className="text-[10px] uppercase font-mono font-bold tracking-widest px-2.5 py-1 bg-[#eef6f0] text-[#3e7256] rounded-full">
+                        Disponible
+                      </span>
+                    </div>
+                    <h4 className="font-serif text-base font-bold text-natural-dark group-hover:text-natural-primary transition-colors">
+                      Clase II: Camino Interior
+                    </h4>
+                    <p className="text-xs text-natural-text-muted mt-2 leading-relaxed line-clamp-3">
+                      Inicia la alquimia de los Tres Tesoros (San Bao), los Tres Dantians, la órbita microcósmica, el trazado de símbolos, la psicología de Carl Jung y el juego evaluativo.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-natural-primary pt-4 mt-auto border-t border-natural-border/40 w-full">
+                    <span>Ingresar a Clase II</span>
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </button>
+
+                {/* Card 3 (Locked) */}
+                <div 
+                  className="bg-[#faf9fa]/80 p-6 rounded-3xl border border-dashed border-gray-200 text-gray-500 flex flex-col justify-between h-auto min-h-[19.5rem] shadow-3xs relative overflow-hidden group"
+                >
+                  <div className="absolute top-4 right-4 text-gray-400">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="p-2.5 rounded-2xl bg-gray-100 text-gray-400">
+                        <Music className="w-5 h-5 animate-pulse" />
+                      </div>
+                      <span className="text-[9px] uppercase font-mono font-bold tracking-widest px-2 py-0.5 bg-gray-100 text-gray-400 rounded-full flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5" /> Bloqueado
+                      </span>
+                    </div>
+                    <h4 className="font-serif text-sm font-bold text-gray-400">
+                      Clase III
+                    </h4>
+                    <div className="mt-3 p-4 bg-white border border-gray-150 rounded-2xl text-xs sm:text-sm lg:text-[15px] italic text-natural-dark font-medium leading-relaxed font-sans shadow-3xs relative select-text cursor-text">
+                      &ldquo;Si me nombras, me niegas. Al darme un nombre, una etiqueta, niegas las otras posibilidades que podría ser.&rdquo;
+                      <div className="text-right text-[11px] font-bold text-natural-primary mt-2">— Søren Kierkegaard</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 pt-3 mt-auto border-t border-gray-100/60 w-full">
+                    <span>Módulo por definir</span>
+                  </div>
+                </div>
+
+                {/* Card 4 (Locked) */}
+                <div 
+                  className="bg-[#faf9fa]/80 p-6 rounded-3xl border border-dashed border-gray-200 text-gray-500 flex flex-col justify-between h-auto min-h-[19.5rem] shadow-3xs relative overflow-hidden group"
+                >
+                  <div className="absolute top-4 right-4 text-gray-400">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="p-2.5 rounded-2xl bg-gray-100 text-gray-400">
+                        <ClipboardList className="w-5 h-5" />
+                      </div>
+                      <span className="text-[9px] uppercase font-mono font-bold tracking-widest px-2 py-0.5 bg-gray-100 text-gray-400 rounded-full flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5" /> Bloqueado
+                      </span>
+                    </div>
+                    <h4 className="font-serif text-sm font-bold text-gray-400">
+                      Clase IV
+                    </h4>
+                    <div className="mt-3 p-4 bg-white border border-gray-150 rounded-2xl text-xs sm:text-sm lg:text-[15px] italic text-natural-dark font-medium leading-relaxed font-sans shadow-3xs relative select-text cursor-text">
+                      &ldquo;Existir es cambiar, cambiar es madurar, madurar es crearse sin cesar.&rdquo;
+                      <div className="text-right text-[11px] font-bold text-natural-primary mt-2">— Henri Bergson</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 pt-3 mt-auto border-t border-gray-100/60 w-full">
+                    <span>Módulo por definir</span>
+                  </div>
+                </div>
+
+                {/* Card 5 (Locked) */}
+                <div 
+                  className="bg-[#faf9fa]/80 p-6 rounded-3xl border border-dashed border-gray-200 text-gray-500 flex flex-col justify-between h-auto min-h-[19.5rem] shadow-3xs relative overflow-hidden group"
+                >
+                  <div className="absolute top-4 right-4 text-gray-400">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="p-2.5 rounded-2xl bg-gray-100 text-gray-400">
+                        <BookOpen className="w-5 h-5" />
+                      </div>
+                      <span className="text-[9px] uppercase font-mono font-bold tracking-widest px-2 py-0.5 bg-gray-100 text-gray-400 rounded-full flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5" /> Bloqueado
+                      </span>
+                    </div>
+                    <h4 className="font-serif text-sm font-bold text-gray-400">
+                      Clase V
+                    </h4>
+                    <div className="mt-3 p-4 bg-white border border-gray-150 rounded-2xl text-xs sm:text-sm lg:text-[15px] italic text-natural-dark font-medium leading-relaxed font-sans shadow-3xs relative select-text cursor-text">
+                      &ldquo;Un libro debe ser el hacha que rompa el mar helado dentro de nosotros.&rdquo;
+                      <div className="text-right text-[11px] font-bold text-natural-primary mt-2">— Franz Kafka</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 pt-3 mt-auto border-t border-gray-100/60 w-full">
+                    <span>Módulo por definir</span>
+                  </div>
+                </div>
+
+                {/* Card 6 (Locked) */}
+                <div 
+                  className="bg-[#faf9fa]/80 p-6 rounded-3xl border border-dashed border-gray-200 text-gray-500 flex flex-col justify-between h-auto min-h-[19.5rem] shadow-3xs relative overflow-hidden group"
+                >
+                  <div className="absolute top-4 right-4 text-gray-400">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="p-2.5 rounded-2xl bg-gray-100 text-gray-400">
+                        <Grid className="w-5 h-5" />
+                      </div>
+                      <span className="text-[9px] uppercase font-mono font-bold tracking-widest px-2 py-0.5 bg-gray-100 text-gray-400 rounded-full flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5" /> Bloqueado
+                      </span>
+                    </div>
+                    <h4 className="font-serif text-sm font-bold text-gray-400">
+                      Clase VI
+                    </h4>
+                    <div className="mt-3 p-4 bg-white border border-gray-150 rounded-2xl text-xs sm:text-sm lg:text-[15px] italic text-natural-dark font-medium leading-relaxed font-sans shadow-3xs relative select-text cursor-text">
+                      &ldquo;Tenés poder sobre tu mente, no sobre los acontecimientos externos.&rdquo;
+                      <div className="text-right text-[11px] font-bold text-natural-primary mt-2">— Marco Aurelio, Meditaciones</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 pt-3 mt-auto border-t border-gray-100/60 w-full">
+                    <span>Módulo por definir</span>
+                  </div>
+                </div>
+
+                {/* Card 7 (Locked) */}
+                <div 
+                  className="bg-[#faf9fa]/80 p-6 rounded-3xl border border-dashed border-gray-200 text-gray-500 flex flex-col justify-between h-auto min-h-[19.5rem] shadow-3xs relative overflow-hidden group"
+                >
+                  <div className="absolute top-4 right-4 text-gray-400">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="p-2.5 rounded-2xl bg-gray-100 text-gray-400">
+                        <GraduationCap className="w-5 h-5" />
+                      </div>
+                      <span className="text-[9px] uppercase font-mono font-bold tracking-widest px-2 py-0.5 bg-gray-100 text-gray-400 rounded-full flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5" /> Bloqueado
+                      </span>
+                    </div>
+                    <h4 className="font-serif text-sm font-bold text-gray-400">
+                      Clase VII
+                    </h4>
+                    <div className="mt-3 p-4 bg-white border border-gray-150 rounded-2xl text-xs sm:text-sm lg:text-[15px] italic text-natural-dark font-medium leading-relaxed font-sans shadow-3xs relative select-text cursor-text">
+                      &ldquo;Hay que tener todavía caos dentro de sí para poder dar a luz una estrella danzante.&rdquo;
+                      <div className="text-right text-[11px] font-bold text-natural-primary mt-2">— Friedrich Nietzsche</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 pt-3 mt-auto border-t border-gray-100/60 w-full">
+                    <span>Módulo por definir</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* STANDARD COURSE TWO-COLUMN LAYOUT */
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* SIDE BAR NAVIGATION (only visible on large screens) */}
+            <aside className="hidden lg:block w-64 shrink-0 print:hidden">
+              <div className="sticky top-24 space-y-6">
+                <div className="bg-white p-5 rounded-2xl border border-natural-border shadow-xs">
+                  <h3 className="text-xs font-bold font-serif text-natural-primary tracking-wider mb-4 uppercase">
+                    {selectedClass === 1 && "Temas de Clase I"}
+                    {selectedClass === 2 && "Temas de Clase II"}
+                    {selectedClass === 3 && "Temas de Clase III"}
+                    {selectedClass === 4 && "Temas de Clase IV"}
+                    {selectedClass === 5 && "Temas de Clase V"}
+                    {selectedClass === 6 && "Temas de Clase VI"}
+                    {selectedClass === 7 && "Temas de Clase VII"}
+                  </h3>
 
               <div className="space-y-1.5">
                 {menuItems.map((item, idx) => {
@@ -2142,7 +2648,7 @@ export default function App() {
                         plane: "Tierra",
                         archetype: "El Guerrero Luminoso / El Constructor",
                         imageSrc: choKuReiImg,
-                        color: "border-[#C29B38]/30 bg-amber-50/10"
+                        color: "border-[#D4AF37]/30 bg-[#FFFDF5]"
                       },
                       {
                         id: "sei-he-ki",
@@ -2158,7 +2664,7 @@ export default function App() {
                         plane: "Luna",
                         archetype: "La Madre Universal / La Compasión",
                         imageSrc: seiHeKiImg,
-                        color: "border-[#5B9DA2]/30 bg-teal-50/10"
+                        color: "border-[#D4AF37]/30 bg-[#FFFDF5]"
                       },
                       {
                         id: "hon-sha-ze-sho-nen",
@@ -2174,7 +2680,7 @@ export default function App() {
                         plane: "Sol",
                         archetype: "El Guardián / El Rey Justo",
                         imageSrc: honShaZeShoNenImg,
-                        color: "border-[#C2735B]/30 bg-red-50/10"
+                        color: "border-[#D4AF37]/30 bg-[#FFFDF5]"
                       }
                     ].map((symbol, idx) => (
                       <div 
@@ -2212,7 +2718,7 @@ export default function App() {
 
                           <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="p-3 rounded-xl bg-natural-eggshell/50 border border-natural-border/60">
-                              <span className="text-[9px] font-mono uppercase tracking-wider text-natural-primary font-bold block">Deidad de Kurama:</span>
+                              <span className="text-[9px] font-mono uppercase tracking-wider text-natural-primary font-bold block">Resonancia en Kurama:</span>
                               <span className="text-xs font-serif font-bold text-natural-dark block mt-0.5">{symbol.deity}</span>
                               <span className="text-[10px] text-natural-text-muted">{symbol.deityOrigin} (Sonten)</span>
                             </div>
@@ -2237,7 +2743,7 @@ export default function App() {
                         <thead>
                           <tr className="bg-natural-eggshell border-b border-natural-border font-mono text-[10px] text-natural-text-muted uppercase">
                             <th className="p-3">Tradición Taoísta</th>
-                            <th className="p-3">Deidad de Kurama</th>
+                            <th className="p-3">Resonancia en Kurama</th>
                             <th className="p-3">Símbolo de Reiki</th>
                             <th className="p-3">Plano Celestial</th>
                           </tr>
@@ -2372,6 +2878,13 @@ export default function App() {
                     Acompaña tu instrucción teórica con recursos audiovisuales oficiales de la maestría para el Nivel II. Visualiza las listas de reproducción recomendadas y videos demostrativos seleccionados para tu formación de Okuden.
                   </p>
 
+                  <div className="bg-natural-sand/40 border border-natural-border/70 rounded-2xl p-4 flex items-start gap-3 shadow-3xs">
+                    <Info className="w-5 h-5 text-natural-primary shrink-0 mt-0.5" />
+                    <p className="text-xs sm:text-sm text-natural-text-muted font-medium leading-relaxed">
+                      Todo conocimiento necesita su tiempo para revelarse. Por eso, algunos contenidos de esta clase se habilitarán de manera progresiva, acompañando el ritmo natural de la Maestría.
+                    </p>
+                  </div>
+
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left/Middle Column: Player & Active Video info */}
                     <div className="lg:col-span-2 space-y-4">
@@ -2496,39 +3009,49 @@ export default function App() {
                           Manuales en PDF ({downloadableDocs2.length})
                         </h4>
                         
-                        <p className="text-[11px] text-natural-text-muted leading-relaxed">
-                          Puedes hacer clic para descargar o abrir el material de estudio directo desde Google Drive:
-                        </p>
+                        {downloadableDocs2.length > 0 ? (
+                          <>
+                            <p className="text-[11px] text-natural-text-muted leading-relaxed">
+                              Puedes hacer clic para descargar o abrir el material de estudio directo desde Google Drive:
+                            </p>
 
-                        <div className="space-y-3 pt-1">
-                          {downloadableDocs2.map((doc) => (
-                            <div 
-                              key={doc.id}
-                              className="bg-white p-3 rounded-2xl border border-natural-border/60 hover:border-natural-primary/55 transition-all shadow-3xs group flex flex-col justify-between"
-                            >
-                              <div>
-                                <span className="text-[11px] font-bold text-[#3D301E] block group-hover:text-natural-primary transition-colors leading-normal">
-                                  {doc.title}
-                                </span>
-                                <p className="text-[10px] text-natural-text-muted/90 mt-1 leading-normal">
-                                  {doc.description}
-                                </p>
-                              </div>
-                              
-                              <div className="mt-3 flex justify-end">
-                                <a
-                                  href={doc.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-natural-sand hover:bg-natural-primary/10 rounded-lg text-[10px] uppercase tracking-wider font-bold text-natural-primary transition-colors focus:outline-none border border-natural-border/40 hover:border-natural-primary/30"
+                            <div className="space-y-3 pt-1">
+                              {downloadableDocs2.map((doc) => (
+                                <div 
+                                  key={doc.id}
+                                  className="bg-white p-3 rounded-2xl border border-natural-border/60 hover:border-natural-primary/55 transition-all shadow-3xs group flex flex-col justify-between"
                                 >
-                                  <Download className="w-3.5 h-3.5" />
-                                  <span>Descargar Manual</span>
-                                </a>
-                              </div>
+                                  <div>
+                                    <span className="text-[11px] font-bold text-[#3D301E] block group-hover:text-natural-primary transition-colors leading-normal">
+                                      {doc.title}
+                                    </span>
+                                    <p className="text-[10px] text-natural-text-muted/90 mt-1 leading-normal">
+                                      {doc.description}
+                                    </p>
+                                  </div>
+                                  
+                                  <div className="mt-3 flex justify-end">
+                                    <a
+                                      href={doc.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-natural-sand hover:bg-natural-primary/10 rounded-lg text-[10px] uppercase tracking-wider font-bold text-natural-primary transition-colors focus:outline-none border border-natural-border/40 hover:border-natural-primary/30"
+                                    >
+                                      <Download className="w-3.5 h-3.5" />
+                                      <span>Descargar Manual</span>
+                                    </a>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
+                          </>
+                        ) : (
+                          <div className="bg-white p-4 rounded-2xl border border-dashed border-natural-border/60 text-center space-y-1">
+                            <p className="text-[11px] text-natural-text-muted/90 italic leading-relaxed">
+                              El nuevo material de estudio oficial se encuentra en proceso de edición y se habilitará en este espacio próximamente.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -2981,7 +3504,8 @@ export default function App() {
             </motion.div>
           </AnimatePresence>
         </section>
-
+          </div>
+        )}
       </main>
 
       {/* FOOTER */}
