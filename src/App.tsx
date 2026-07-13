@@ -75,9 +75,9 @@ import {
   CLASS2_TRIVIA_QUESTIONS
 } from "./data/class2Content";
 
-import choKuReiImg from "./assets/images/CKR.png";
-import seiHeKiImg from "./assets/images/SHK.png";
-import honShaZeShoNenImg from "./assets/images/HSZSN.png";
+import choKuReiImg from "./assets/images/cho_ku_rei_stone_gold.jpg";
+import seiHeKiImg from "./assets/images/sei_he_ki_stone_gold.jpg";
+import honShaZeShoNenImg from "./assets/images/hon_sha_ze_sho_nen_stone_gold.jpg";
 import toriiGateImg from "./assets/images/torii_gate.jpg";
 
 export default function App() {
@@ -2089,7 +2089,7 @@ export default function App() {
                   </div>
 
                   <p className="text-natural-text-muted text-sm leading-relaxed">
-                    Acompaña tu instrucción teórica con recursos audiovisuales oficiales de la maestría. Visualiza las listas de reproducción recomendadas y videos demostrativos seleccionados para tu formación de Gokuikaiden.
+                    Acompañá tu instrucción teórica con recursos audiovisuales. Visualizá las listas de reproducción recomendadas y videos demostrativos seleccionados para tu formación de Gokuikaiden.
                   </p>
 
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -2296,7 +2296,7 @@ export default function App() {
 
                   <div className="text-natural-text-muted text-sm leading-relaxed space-y-3">
                     <p>
-                      La Maestría en Reiki no es una meta que se obtiene de la noche a la mañana, sino un sendero sin fin. Esta aplicación interactiva cubre con devoción la <strong className="text-natural-dark">Clase I de Gokuikaiden</strong>, ofreciendo las bases tradicionales sólidas.
+                      La Maestría en Reiki no es una meta que se obtiene de la noche a la mañana, sino un sendero sin fin. Esta aplicación interactiva cubre la <strong className="text-natural-dark">Clase I de Gokuikaiden</strong>, ofreciendo las bases tradicionales sólidas.
                     </p>
                     <p>
                       A continuación, descubre la hoja de ruta y planificación didáctica del manual para que puedas vislumbrar cómo crecerá tu canal energético en las clases venideras de Reiki Tradicional Japonés de nuestra escuela:
@@ -3350,7 +3350,7 @@ export default function App() {
                                     </div>
                                     <p className="text-xs text-natural-text-muted leading-relaxed max-w-md mx-auto">
                                       {passed 
-                                        ? "¡Excelente nivel de maestría e integración del Camino Interior! Has asimilado con devoción las uniones de las tradiciones de Oriente."
+                                        ? "¡Excelente nivel de maestría e integración del Camino Interior! Has asimilado las uniones de las tradiciones de Oriente."
                                         : "Has respondido bien algunas preguntas, pero para sintonizar el diploma necesitas al menos 4 respuestas correctas (80%). Relee el material y vuelve a intentar."}
                                     </p>
                                   </div>
